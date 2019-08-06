@@ -580,11 +580,9 @@ $ oc patch deploy/couchdb --patch \
 
 ### Application LoadBalancer cutover
 
-Storage Migration
------------------
+## Storage Migration
 
-Platform Data Migration
------------------------
+## Platform Data Migration
 
 ### Monitoring Data
 

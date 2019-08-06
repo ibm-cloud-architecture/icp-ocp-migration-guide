@@ -273,8 +273,6 @@ maintained by IBM around developer tooling. These include:
 The IBM Cloud Pak for Applications is still in development and may
 include more components in the future.
 
-## Dev toolchain (Roland)
-
 ## DevOps
 
 As mentioned earlier, OpenShift provides an opinionated development
@@ -470,7 +468,7 @@ hypervisors, operating system and platform automation.
 ## Hardware and hypervisor
 
 ICP can be deployed on (Linux) x86\_64, Power (ppc64le) and IBM Z and
-LinuxOne. OpenShift now can only run x86\_64 hardware. Each has its own
+LinuxOne. OpenShift now can run x86\_64 and Power hardware. Each has its own
 sizing recommendation in terms of CPU, memory and disk space. You can
 reference the system requirement for both below:
 
