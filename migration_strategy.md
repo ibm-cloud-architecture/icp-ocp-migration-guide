@@ -558,7 +558,7 @@ $ oc patch deploy/inventory-mysql --patch \
      '{"spec":{"template":{"spec":{"serviceAccountName":"inventory-myql"}}}}}'
 ```
 
-### Using anyuid SeucirtyContextConstraint
+### Using `anyuid` SeucirtyContextConstraint
 
 In cases where running as the root user is absolutely necessary, we can
 leverage a serviceaccount and assign the \"anyuid\" SCC to allow the
@@ -598,7 +598,7 @@ Openshift's value proposition does include some developer productivity tools suc
 
 #### Jenkins server migration
 
-One scenario that bears mentioning is if the CI toolchain was deployed to ICP, typically using the community Helm chart.  For example, In the BlueCompute case, this was done using a containerized Jenkins instance that was deployed using a Helm chart.  All of the stages in the pipelines run as containers in Kubernetes using the Kubernetes plugin.
+One scenario that bears mentioning is if the CI toolchain was deployed to ICP, typically using the community Helm chart.  For example, In the BlueCompute case, this was done using a containerized Jenkins instance.  All of the stages in the pipelines run as containers in Kubernetes using the Kubernetes plugin.
 
 https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes
 
@@ -606,7 +606,9 @@ The best practice around Jenkins is for the pipelines themselves to be written u
 
 Openshift has both ephemeral and persistent Jenkins in the catalog which is very comparable to the Jenkins Helm chart.  This instance of Jenkins will automatically install the Kubernetes and Openshift client plugins, so Jenkinsfile that uses podTemplates that spin up containers to run stages in the pipeline should "just work".
 
-As pipeline stages are run in containers, there are security issues when a particular stage attempts to run a container that requires root access, mounts a hostpath, etc.  Most runtime build images don't run as root (e.g. maven, gradle, etc).  One security problem when using Kubernetes plugin is how to build the container image itself, which must run in a container.  In Openshift this is further complicated that we should not hostmount the docker socket, run as root, or run in privileged mode.  The community is still attempting to resolve this problem, since traditionally the Docker tool requires root and many of the functions involved in building a container image requires various elevated privileges.
+As pipeline stages are run in containers, there are security issues when a particular stage attempts to run a container that requires root access, mounts a hostpath, etc.  Most runtime build images don't run as root (e.g. maven, gradle, etc).  
+
+One security problem when using Kubernetes plugin is how to build the container image itself, which must run in a container.  In Openshift this is further complicated that the default `restricted` SCC disallows hostmounting the docker socket, running as root, or running in privileged mode without changing the SCC.  The community is still attempting to resolve this problem, since traditionally the Docker tool requires root and many of the functions involved in building a container image requires various elevated privileges.
 
 There are a few projects at various stages in development as of this writing that can build container images without docker, which run fine outside of a container, but none are perfect inside of a container.
 
@@ -616,7 +618,16 @@ There are a few projects at various stages in development as of this writing tha
 - [makisu](https://github.com/uber/makisu)
 - [buildah](https://github.com/containers/buildah)
 
-If running the Jenkins pipeline in Openshift, we can leverage the Openshift BuildConfig to build the container image, which provides a controlled environment for producing the container image without exposing `root` access on any worker nodes.  This will push the image to the Openshift private registry, and we can provide a stage using [skopeo](https://github.com/containers/skopeo) to push this to the external registry.
+When using these tools, we can relax the security on them by adding the SCC to the `jenkins` service account in the namespace where the pod runs.  For example, kaniko requires `root` access, so we can simply add the `anyuid` scc to enable kaniko:
+
+```
+$ oc adm policy add-scc-to-user anyuid -z jenkins
+```
+
+Note the security implications of the above, that while containers are running with elevated privileges, that any other workload running on the same worker node may be vulnerable to attack.  It may make sense to use a `nodeSelector` on all projects where jenkins will run to isolate jenkins workloads to just a few nodes: https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#setting-the-project-wide-node-selector
+
+
+Alternatively, if we are running the Jenkins pipeline in Openshift, we can leverage the Openshift BuildConfig to build the container image, which provides a controlled environment for producing the container image without exposing `root` access on any worker nodes.  By providing just a `Dockerfile` and a context, Openshift will build and push the resulting image to the Openshift private registry and track it using an ImageStream, and we can then provide an additional stage using [skopeo](https://github.com/containers/skopeo) to push this to an external registry.
 
 We have posted an example pipeline we used at a customer that leverages this at the following git repository:
 
