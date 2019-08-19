@@ -190,13 +190,17 @@ identityProviders:
 
 Pay particular interest to the url. The format of the URL is
 
+```
 ldap://host:port/basedn?attribute?scope?filter
+```
 
 We have translated this from the ICP configuration, where "attribute"
 and "filter" are built from the "User filter" in the ICP configuration.
 The query it uses is:
 
-`(&(attribute=%v)(filter))`
+```
+(&(attribute=%v)(filter))
+```
 
 Openshift has explicit "user" and "group" resources which the API server
 manages. You can list them using the familiar "oc get users" and "oc get
@@ -248,6 +252,8 @@ Openshift there are two options:
     Using the above policy makes sense in production clusters but can be
     relaxed in development/test clusters.
 
+### Group migration -- LDAP
+
 Note that the Openshift api server does not query groups from LDAP;
 group definitions must be synced manually. The documentation around this
 is here:
@@ -298,7 +304,6 @@ group/dev1
 group/admin
 group/dev2
 ```
-
 
 The result is three groups, with the user mappings as shown.
 
@@ -420,31 +425,34 @@ You can add applications to this project with the 'new-app' command. For example
     oc new-app centos/ruby-25-centos7~https://github.com/sclorg/ruby-ex.git
 
 to build a new example application in Ruby.
+```
 
+We initially gave access to both of these entities:
+
+```
 $ oc adm policy add-role-to-group view dev1
 role "view" added: "dev1"
-$ oc adm policy add-role-to-group icp:view dev1
-role "icp:view" added: "dev1"
 $ oc adm policy add-role-to-user view user1
 role "view" added: "user1"
+```
+
+Next we assigned the ICP role to give the same access that the user had in ICP.
+
+```
+$ oc adm policy add-role-to-group icp:view dev1
+role "icp:view" added: "dev1"
 $ oc adm policy add-role-to-user icp:admin user1
 role "icp:admin" added: "user1"
 ```
 
 ## Workload Migration
 
-In this section we focused on migrating our cloud native reference
+In this section we used a case study of migrating our cloud native reference
 application BlueCompute that was running on ICP to Openshift.
 
 <https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes>
 
-#### DevOps and Developer toolchains
-
-#### Declarative deployment and GitOps adoption
-
-#### Using a Backup/Restore approach using Velero
-
-#### Modify containers to run as non-root and other mitigations
+### Modify containers to run as non-root and other mitigations
 
 Following some guidelines here:
 
@@ -454,12 +462,11 @@ Openshift specific:
 
 <https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html#openshift-specific-guidelines>
 
-In general, when authoring containers, developers should treat the
-container filesystem as read only.
+In general, when authoring containers, developers should try run with the least privileges as possible.
 
-If a container's Dockerfile does not set a USER, then it runs as root.
-This is dangerous because root inside a container is still root on the
-host. Openshift prevents containers from running as "root" by applying a
+#### Modifying a container's USER
+
+If a container's Dockerfile does not set a USER, then it runs as root by default.This is dangerous because root inside a container is also root on the host. Openshift prevents containers from running as "root" by applying a
 default "restricted" SecurityContextConstraint. When a container is
 started, Openshift will randomly select a uid from a range that does not
 have access to anything on the worker node in case a malicious container
@@ -473,14 +480,17 @@ filesystem or to a persistent volume. A simple mitigation is to add the
 USER directive to the Dockerfile before the CMD or ENTRYPOINT so that
 the main container process does not run as root, e.g.
 
-`USER 1000`
+```
+USER 1000
+```
+
+Then making sure the files it modifies contains the correct permissions.
 
 It's better to provide a numeric value rather than an existing user in
 /etc/passwd in the container's filesystem, as Openshift will be able to
 validate the numeric value against any SCCs that restrict the uids that
 a container may run as. In the case where we use a third party container
-and we are not able to modify the Dockerfile, or the USER directive
-refers to a user that corresponds to something in /etc/passwd, we can
+and we are not able to modify the Dockerfile, or the USER directive refers to a user that corresponds to something in /etc/passwd, we can
 add the securityContext section to the podspec to identify the UID that
 it the pod refers to. For example, in BlueCompute the MySQL container we
 used is from dockerhub, but they allow running as USER mysql which
@@ -499,6 +509,8 @@ the container's processes. For example, in the above case the container
 process can also interact with files owned by group 1000, which might be
 helpful if using existing shared storage where there are directories
 owned by the group.
+
+### Modifying a container's filesystem for read/write
 
 If filesystem access is needed in the container filesystem, then those
 files should be owned by and read/writable by the root group. In
@@ -524,6 +536,8 @@ volumes:
   name: database-storage
 ```
 
+### Using a `nonroot` SecurityContextConstraint
+
 In cases where existing shared storage is attached to the container as a
 volume, and the container must write to the filesystem as a particular
 uid, we can run the pod under a service account, and assign the
@@ -543,6 +557,8 @@ $ oc adm policy add-scc-to-user nonroot -z inventory-mysql
 $ oc patch deploy/inventory-mysql --patch \
      '{"spec":{"template":{"spec":{"serviceAccountName":"inventory-myql"}}}}}'
 ```
+
+### Using `anyuid` SeucirtyContextConstraint
 
 In cases where running as the root user is absolutely necessary, we can
 leverage a serviceaccount and assign the \"anyuid\" SCC to allow the
@@ -573,6 +589,56 @@ $ oc adm policy add-scc-to-user anyuid -z customer-couchdb
 $ oc patch deploy/couchdb --patch \
      '{"spec":{"template":{"spec":{"serviceAccountName":"customer-couchdb"}}}}}'
 ```
+
+### DevOps and Developer toolchains
+
+Generally, ICP was not opinionated on DevOps, and if the toolchain is outside of the platform there is no reason for this to change when migrating to Openshift.  
+
+Openshift's value proposition does include some developer productivity tools such as Source-to-Image (S2I) and containerized Jenkins, as well as tech preview and support for Openshift Pipelines and CodeReady Workspaces, but in a migration scenario where we are migrating existing workload from ICP these are not required to change.  We can simply treat Openshift as another Kubernetes platform we are deploying to.
+
+#### Jenkins server migration
+
+One scenario that bears mentioning is if the CI toolchain was deployed to ICP, typically using the community Helm chart.  For example, In the BlueCompute case, this was done using a containerized Jenkins instance.  All of the stages in the pipelines run as containers in Kubernetes using the Kubernetes plugin.
+
+https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes
+
+The best practice around Jenkins is for the pipelines themselves to be written using a declarative `Jenkinsfile` stored with the code.  The pipeline logic is then treated as code and stored with the application source code.  In BlueCompute, Jenkinsfiles are stored with each microservice, so we only needed to create an instance of Jenkins in Openshift.
+
+Openshift has both ephemeral and persistent Jenkins in the catalog which is very comparable to the Jenkins Helm chart.  This instance of Jenkins will automatically install the Kubernetes and Openshift client plugins, so Jenkinsfile that uses podTemplates that spin up containers to run stages in the pipeline should "just work".
+
+As pipeline stages are run in containers, there are security issues when a particular stage attempts to run a container that requires root access, mounts a hostpath, etc.  Most runtime build images don't run as root (e.g. maven, gradle, etc).  
+
+One security problem when using Kubernetes plugin is how to build the container image itself, which must run in a container.  In Openshift this is further complicated that the default `restricted` SCC disallows hostmounting the docker socket, running as root, or running in privileged mode without changing the SCC.  The community is still attempting to resolve this problem, since traditionally the Docker tool requires root and many of the functions involved in building a container image requires various elevated privileges.
+
+There are a few projects at various stages in development as of this writing that can build container images without docker, which run fine outside of a container, but none are perfect inside of a container.
+
+- [kaniko](https://github.com/GoogleContainerTools/kaniko)
+- [orca-build](https://github.com/cyphar/orca-build)
+- [img](https://github.com/genuinetools/img)
+- [makisu](https://github.com/uber/makisu)
+- [buildah](https://github.com/containers/buildah)
+
+When using these tools, we can relax the security on them by adding the SCC to the `jenkins` service account in the namespace where the pod runs.  For example, kaniko requires `root` access, so we can simply add the `anyuid` scc to enable kaniko:
+
+```
+$ oc adm policy add-scc-to-user anyuid -z jenkins
+```
+
+Note the security implications of the above, that while containers are running with elevated privileges, that any other workload running on the same worker node may be vulnerable to attack.  It may make sense to use a `nodeSelector` on all projects where jenkins will run to isolate jenkins workloads to just a few nodes: https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#setting-the-project-wide-node-selector
+
+
+Alternatively, if we are running the Jenkins pipeline in Openshift, we can leverage the Openshift BuildConfig to build the container image, which provides a controlled environment for producing the container image without exposing `root` access on any worker nodes.  By providing just a `Dockerfile` and a context, Openshift will build and push the resulting image to the Openshift private registry and track it using an ImageStream, and we can then provide an additional stage using [skopeo](https://github.com/containers/skopeo) to push this to an external registry.
+
+We have posted an example pipeline we used at a customer that leverages this at the following git repository:
+
+https://github.com/jkwong888/liberty-hello-world-openshift/blob/master/Jenkinsfile
+
+
+#### Declarative deployment and GitOps adoption
+
+
+### Using a Backup/Restore approach using Velero
+
 
 ### Converting PodSecurityPolicy to SecurityContextConstraints
 
