@@ -582,6 +582,30 @@ $ oc patch deploy/couchdb --patch \
 
 ## Storage Migration
 
+We will focus on Kuberentes Storage under the context of ICP to OCP migration. For detail storage and Kuberentes usage, please reference the [Kubernetes Storage Cookbook](https://ibm-cloud-architecture.github.io/kubernetes-storage-cookbook/).
+
+The migration has to take into consideration of both the Kuberentes Storage Provider and Storage consumer (database or application).
+
+### Storage provider
+
+In general, Kuberentes supports quite a few storage providers including hostPath, NFS, Ceph, Gluster, vSphere, minio, Cloud-based storage (S3 etc.). And these providers can be deployed either as a part of a Kuberentes cluster (internal storage) or storage provided by an external service (external storage). For the migration, we'll focus on the internal storage or in-cluster storage provider.
+
+Following storage can be hosted on ICP cluster nodes:
+
+- GlusterFS
+- Ceph block storage by using Rook
+- Minio
+
+Red Hat OpenShift support both GluserFS and Ceph as in-cluster storage providers. Haven't heard the official support for Minio.
+
+There is no migration path or tools available to migrate ICP storage nodes to OpenShift. So, it boils down to handle the migration from the storage consumer's aspect.
+
+If you are using external storage provider, as far as it is supported by OpenShift (all do except Minio), you just need to migrate the storage consumer and leave the external storage provider as-is.
+
+If you are using internal storage provider, you need to setup the OpenShift Storage nodes, either GlusterFS or Ceph, using the same/similar spec as in ICP in terms of disk size, storage type, number of nodes. Then, proceed to storage consumer migration.
+
+ 
+
 ## Platform Data Migration
 
 ### Monitoring Data
