@@ -586,7 +586,7 @@ We will focus on Kuberentes Storage under the context of ICP to OCP migration. F
 
 The migration has to take into consideration of both the Kuberentes Storage Provider and Storage consumer (database or application).
 
-### Storage provider
+### Storage Provider
 
 In general, Kuberentes supports quite a few storage providers including hostPath, NFS, Ceph, Gluster, vSphere, minio, Cloud-based storage (S3 etc.). And these providers can be deployed either as a part of a Kuberentes cluster (internal storage) or storage provided by an external service (external storage). For the migration, we'll focus on the internal storage or in-cluster storage provider.
 
@@ -604,7 +604,22 @@ If you are using external storage provider, as far as it is supported by OpenShi
 
 If you are using internal storage provider, you need to setup the OpenShift Storage nodes, either GlusterFS or Ceph, using the same/similar spec as in ICP in terms of disk size, storage type, number of nodes. Then, proceed to storage consumer migration.
 
- 
+### Storage Consumer
+
+Each client might have different storage consumption pattern, we'll try to categorize them into the following:
+
+- Container applications requires persistent Storage
+- Kubernetes Statefulset application
+- Databases running on Kubernetes such as MongoDB, MySQL, Cloudant etc.
+
+We'll assume that all these storage needs are implemented as Kuberentes recommended Persistent Volume (PV) and Persistent Volume Claims (PVC).
+
+When it comes to migration to OCP, it really becomes a storage backup and restore discussion. Depends on the storage consumer type (database vs. custom application), it can be done with:
+
+- Kubernetes PV backup and restore
+- Using Application/Database native backup-restore tools
+
+This guide will be focus on the first approach where you migrate kubernetes PV. 
 
 ## Platform Data Migration
 
