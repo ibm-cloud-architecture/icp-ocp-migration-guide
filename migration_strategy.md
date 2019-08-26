@@ -619,7 +619,18 @@ When it comes to migration to OCP, it really becomes a storage backup and restor
 - Kubernetes PV backup and restore
 - Using Application/Database native backup-restore tools
 
-This guide will be focus on the first approach where you migrate kubernetes PV. 
+This guide will be focus on the first approach where you migrate kubernetes PV.
+
+One common approach of backing up Kubernetes PV is the [Velero project](https://github.com/heptio/velero) from Heptio. The concept is Velero will take your PV snapshots, stores it on object storage (like S3 or Minio). Then, you can restore it to another Kubernetes cluster.
+
+For detail on how the tool works in generic Kubernetes, please reference [this blog post](https://blog.kubernauts.io/backup-and-restore-of-kubernetes-applications-using-heptios-velero-with-restic-and-rook-ceph-as-2e8df15b1487)
+
+Still, there are some limitations with Velero approach. For example:
+
+- It does not support the migration of persistent volumes across cloud providers.
+- Velero + Restic currently supports backing up to only S3 compatible object storage.   
+
+
 
 ## Platform Data Migration
 
