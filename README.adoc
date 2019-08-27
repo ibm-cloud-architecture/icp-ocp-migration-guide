@@ -3,5 +3,13 @@
 
 Note that the guide is still being developed and updates are still ongoing.
 
-include::./key_differences.adoc[Key Differences Between Openshift and ICP]
-include::./migration_strategy.adoc[Migration Strategy]
+ifndef::env-github[]
+include::./key_differences.adoc[key differences between openshift and icp]
+include::./migration_strategy.adoc[migration strategy]
+endif::[]
+
+ifdef::env-github[]
+link:./key_differences.adoc[key differences between openshift and icp]
+link:./migration_strategy.adoc[migration strategy]
+endif::[]
+
