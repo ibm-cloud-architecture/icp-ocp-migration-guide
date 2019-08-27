@@ -40,9 +40,9 @@ endif::[]
 
 ifdef::env-github[]
 
-* link::./migration/ldap_migration.adoc[LDAP Migration]
+* link:./migration/ldap_migration.adoc[LDAP Migration]
 
-* link::./migration/rbac_migration.adoc[RBAC Migration]
+* link:./migration/rbac_migration.adoc[RBAC Migration]
 
 endif::[]
 
@@ -65,9 +65,9 @@ endif::[]
 
 ifdef::env-github[]
 
-* link::./migration/container_mod.adoc[Modifying Containers to run in Openshift]
+* link:./migration/container_mod.adoc[Modifying Containers to run in Openshift]
 
-* link::./migration/container_scc.adoc[Running Containers using SecurityContextConstraints in Openshift]
+* link:./migration/container_scc.adoc[Running Containers using SecurityContextConstraints in Openshift]
 
 endif::[]
 
