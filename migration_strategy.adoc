@@ -1,5 +1,9 @@
 == Migration Strategy – ICP Cluster migration
 :toc:
+:toc-placement!:
+
+
+toc::[]
 
 === OpenShift Installation
 
@@ -26,9 +30,21 @@ capacity is made available.
 
 === User Migration
 
+ifndef::env-github[]
+
 include::./migration/ldap_migration.adoc[LDAP Migration]
 
 include::./migration/rbac_migration.adoc[RBAC Migration]
+
+endif::[]
+
+ifdef::env-github[]
+
+* link::./migration/ldap_migration.adoc[LDAP Migration]
+
+* link::./migration/rbac_migration.adoc[RBAC Migration]
+
+endif::[]
 
 
 === Workload Migration
@@ -38,9 +54,22 @@ application BlueCompute that was running on ICP to Openshift.
 
 https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes
 
+ifndef::env-github[]
+
 include::./migration/container_mod.adoc[Modifying Containers to run in Openshift]
 
 include::./migration/container_scc.adoc[Running Containers using SecurityContextConstraints in Openshift]
+
+endif::[]
+
+
+ifdef::env-github[]
+
+* link::./migration/container_mod.adoc[Modifying Containers to run in Openshift]
+
+* link::./migration/container_scc.adoc[Running Containers using SecurityContextConstraints in Openshift]
+
+endif::[]
 
 ==== DevOps and Developer toolchains
 

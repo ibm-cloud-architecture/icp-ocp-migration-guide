@@ -1,12 +1,14 @@
-== ICP to OpenShift migration guide
-
 === Key differences between ICP and OpenShift
+:toc:
+:toc-placement!:
 
 IBM Cloud Private (ICP) and Red Hat OpenShift are different Kubernetes
 distributions. Fundamentally, both are based on the core Kubernetes
 technologies. Thus, they bring relatively consistent experience for application
 development and platform operation. From migration perspective, we’ll focus on
 the key differences between the two platforms.
+
+toc::[]
 
 The following is the summary of the key differences:
 
