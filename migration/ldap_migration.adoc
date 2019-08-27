@@ -126,8 +126,9 @@ uid: user4
 ....
 
 The ICP configuration appeared as follows:
+
 ifdef::env-github[]
-:imagesdir: https://github.ibm.com/CASE/openshift-migration-guide/media
+:imagesdir: https://raw.github.ibm.com/CASE/openshift-migration-guide/master/media
 image:image1.png[LDAP settings in ICP]
 endif::[]
 
