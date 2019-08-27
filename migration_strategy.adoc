@@ -169,6 +169,23 @@ https://github.com/jkwong888/liberty-hello-world-openshift/blob/master/Jenkinsfi
 
 === Storage Migration
 
+ifndef::env-github[]
+:leveloffset: +1
+
+include::./migration/storage.adoc[Storage Migration]
+
+:leveloffset:0 
+
+endif::[]
+
+ifdef::env-github[]
+
+* link:./migration/storage.adoc[Storage Migration]
+
+endif::[]
+
+
+
 === Platform Data Migration
 
 ==== Monitoring Data

@@ -5,11 +5,11 @@ and the container must write to the filesystem as a particular uid, we can run
 the pod under a service account, and assign the "nonroot" scc to the service
 account. This relaxes the restrictions on the uid and allows the container
 process to be executed as some specific UID, but not root. This is essentially
-equivalent to ICP’s ``ibm-restricted-psp" security policy. For example, in our
+equivalent to ICP’s ``ibm-restricted-psp`` security policy. For example, in our
 above example our MySQL container runs as uid 5984, but Openshift blocks the
-execution since the uid is not within the allowed range for''restricted" SCC, so
-we created a service account ``inventory-mysql'' for the pod, allow it to use
-the ``nonroot'' SCC and set the deployment to run as this service account.
+execution since the uid is not within the allowed range for``restricted`` SCC, so
+we created a service account ``inventory-mysql`` for the pod, allow it to use
+the ``nonroot`` SCC and set the deployment to run as this service account.
 
 ....
 $ oc create serviceaccount inventory-mysql
@@ -21,7 +21,7 @@ $ oc patch deploy/inventory-mysql --patch \
 ==== Using `+anyuid+` SeucirtyContextConstraint
 
 In cases where running as the root user is absolutely necessary, we can leverage
-a serviceaccount and assign the "anyuid" SCC to allow the container to run as
+a serviceaccount and assign the ``anyuid`` SCC to allow the container to run as
 root. For example, in our BlueCompute reference application, couchdb only works
 when it runs as root due to the way it tries to change ownership of the data
 directories. We will allow couchdb to run as root user:

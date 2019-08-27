@@ -14,7 +14,7 @@ https://kubernetes.io/docs/reference/access-authn-authz/authentication/
 
 In ICP, the internal auth-idp component is used as an OIDC provider that
 authenticates users. This component can be configured from the UI and will
-connect to LDAP on behalf of the cluster to authenticate users. The ``Teams''
+connect to LDAP on behalf of the cluster to authenticate users. The ``Teams``
 concept is used to group together users or groups from LDAP into logical groups
 and is managed by the auth-idp component and persisted in mongodb.
 
@@ -171,26 +171,26 @@ Pay particular interest to the url. The format of the URL is
 ldap://host:port/basedn?attribute?scope?filter
 ....
 
-We have translated this from the ICP configuration, where ``attribute'' and
-``filter'' are built from the ``User filter'' in the ICP configuration. The
+We have translated this from the ICP configuration, where ``attribute`` and
+``filter`` are built from the ``User filter`` in the ICP configuration. The
 query it uses is:
 
 ....
 (&(attribute=%v)(filter))
 ....
 
-Openshift has explicit ``user'' and ``group'' resources which the API server
-manages. You can list them using the familiar ``oc get users'' and ``oc get
-groups'' commands as well as create additional ones.
+Openshift has explicit ``user`` and ``group`` resources which the API server
+manages. You can list them using the familiar ``oc get users`` and ``oc get
+groups`` commands as well as create additional ones.
 
-As Openshift is a developer platform, the default mappingMethod ``claim'' allows
+As Openshift is a developer platform, the default mappingMethod ``claim`` allows
 anybody that successfully authenticates access to the platform to login and
 create projects. When authentication is successful, the platform will create a
-``user'' resource automatically. The ICP model denies access to any users in
+``user`` resource automatically. The ICP model denies access to any users in
 LDAP that are not part of a team. To match the ICP model and deny access to
 anybody not explicitly added to Openshift there are two options:
 
-* use the mappingMethod ``lookup''. However this requires additional overhead as
+* use the mappingMethod ``lookup``. However this requires additional overhead as
 the administrator must individually create users in the Openshift platform
 before they are given access to log in to Openshift.
 +
@@ -209,9 +209,9 @@ identity.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=l
 $ oc create useridentitymapping rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local user1
 useridentitymapping.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local created
 ....
-* Leave the default mappingMethod ``claim'' but deny access to create new
-projects in Openshift. By default the ``system:authenticated'' group
-(i.e. anybody in LDAP) is given the ``self-provisioner'' cluster-role, which
+* Leave the default mappingMethod ``claim`` but deny access to create new
+projects in Openshift. By default the ``system:authenticated`` group
+(i.e. anybody in LDAP) is given the ``self-provisioner`` cluster-role, which
 allows project creation. Removing the role removes the overhead of having to
 create new users as they log in, but also prevents authenticated users from
 consuming resources in the platform without cluster administrator action. See:
@@ -265,10 +265,10 @@ rfc2307:
 ....
 
 Observe how this maps to the configuration in ICP; the groups are of object
-class ``groupOfUniqueNames'' and the ``uniqueMember'' attribute contains the
+class ``groupOfUniqueNames`` and the ``uniqueMember`` attribute contains the
 members of the group which will be in turn queried.
 
-Running this command will add some Openshift ``Group'' resources that can be
+Running this command will add some Openshift ``Group`` resources that can be
 assigned roles.
 
 [source,bash]

@@ -3,19 +3,19 @@
 Kubernetes ships with some out of box user-facing cluster roles:
 https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
 
-* cluster-admin
-* admin
-* edit
-* view
+* `cluster-admin`
+* `admin`
+* `edit`
+* `view`
 
 ICP ships with five additional user-facing cluster roles which correspond to the
 roles used in teams:
 
-* icp:admin
-* icp:edit
-* icp:operate
-* icp:teamadmin
-* icp:view
+* `icp:admin`
+* `icp:edit`
+* `icp:operate`
+* `icp:teamadmin`
+* `icp:view`
 
 These are implemented as aggregated roles, which means there are several roles
 where their permissions are union-ed together to provide a full set of
@@ -23,34 +23,34 @@ permissions for the user. The permissions are contained in aggregate roles. Note
 that the admin role contains all of the permissions that the edit role contains,
 etc.
 
-* icp-admin-aggregate
-* icp-edit-aggregate
-* icp-operate-aggregate
-* icp-view-aggregate
+* `icp-admin-aggregate`
+* `icp-edit-aggregate`
+* `icp-operate-aggregate`
+* `icp-view-aggregate`
 
 Openshift ships with four user-facing cluster roles:
 
-* admin
-* basic-user
-* edit
-* view
+* `admin`
+* `basic-user`
+* `edit`
+* `view`
 
 Since RBAC is common in both Openshift and ICP, it’s tempting to just export
 these 9 roles to Openshift. However, some Openshift-specific resources are added
-to the Kubernetes out-of-box roles. These are in the ``*.openshift.io''
+to the Kubernetes out-of-box roles. These are in the ``*.openshift.io``
 apiGroups defined in the roles for the above.
 
 As clusterroles are whitelists of permissions, and access in Kubernetes is a
 union of all of the roles bound to the identity, one potential way of quickly
 migrating permissions is to import the cluster roles from ICP, assign the ICP
-roles to the users and groups, then assign the Openshift ``view'' role to all
-users so that the projects will appear in the CLI and UI. The Openshift ``view''
-role will overlap with the ``icp:view'' role but the Openshift ``view'' role
+roles to the users and groups, then assign the Openshift ``view`` role to all
+users so that the projects will appear in the CLI and UI. The Openshift ``view``
+role will overlap with the ``icp:view`` role but the Openshift ``view`` role
 will enable view of the Openshift specific resources (e.g. projects, builds,
 etc). This will allow the same access to the Kubernetes API that was assigned in
 ICP. Additional access to Openshift specific objects (e.g. to create a build,
 deployment configs, etc) may be added by assigning Openshift specific roles like
-``edit'', ``admin'', etc.
+``edit``, ``admin``, etc.
 
 Here is one team that we created with the following group/user mappings:
 
