@@ -1,0 +1,6 @@
+= ICP to OpenShift migration guide
+
+Below are some documentation.  Note that the guide is still being developed and updates are still ongoing
+
+- link:./key_differences.adoc[Key Differences Between Openshift and ICP ]
+- link:./migration_strategy.adoc[Migration Strategy]
