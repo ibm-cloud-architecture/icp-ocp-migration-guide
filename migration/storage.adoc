@@ -1,0 +1,77 @@
+=== Storage Migration
+
+We will focus on Kubernetes Storage under the context of ICP to OCP migration.
+For detail storage and Kubernetes usage, please reference the
+https://ibm-cloud-architecture.github.io/kubernetes-storage-cookbook/[Kubernetes
+Storage Cookbook].
+
+The migration has to take into consideration of both the Kubernetes Storage
+Provider and Storage consumer (database or application).
+
+==== Storage Provider
+
+In general, Kubernetes supports quite a few storage providers including
+hostPath, NFS, Ceph, Gluster, vSphere, minio, Cloud-based storage (S3 etc.). And
+these providers can be deployed either as a part of a Kubernetes cluster
+(internal storage) or storage provided by an external service (external
+storage). For the migration, we’ll focus on the internal storage or in-cluster
+storage provider.
+
+Following storage can be hosted on ICP cluster nodes:
+
+* GlusterFS
+* Ceph block storage by using Rook
+* Minio
+
+Red Hat OpenShift support both GluserFS and Ceph as in-cluster storage
+providers. Haven’t heard the official support for Minio.
+
+There is no migration path or tools available to migrate ICP storage nodes to
+OpenShift. So, it boils down to handle the migration from the storage consumer’s
+aspect.
+
+If you are using external storage provider, as far as it is supported by
+OpenShift (all do except Minio), you just need to migrate the storage consumer
+and leave the external storage provider as-is.
+
+If you are using internal storage provider, you need to setup the OpenShift
+Storage nodes, either GlusterFS or Ceph, using the same/similar spec as in ICP
+in terms of disk size, storage type, number of nodes. Then, proceed to storage
+consumer migration.
+
+==== Storage Consumer
+
+Each client might have different storage consumption pattern, we’ll try to
+categorize them into the following:
+
+* Container applications requires persistent Storage
+* Kubernetes Statefulset application
+* Databases running on Kubernetes such as MongoDB, MySQL, Cloudant etc.
+
+We’ll assume that all these storage needs are implemented as Kubernetes
+recommended Persistent Volume (PV) and Persistent Volume Claims (PVC).
+
+When it comes to migration to OCP, it really becomes a storage backup and
+restore discussion. Depends on the storage consumer type (database vs. custom
+application), it can be done with:
+
+* Kubernetes PV backup and restore
+* Using Application/Database native backup-restore tools
+
+This guide will be focus on the first approach where you migrate kubernetes PV.
+
+One common approach of backing up Kubernetes PV is the
+https://github.com/heptio/velero[Velero project] from Heptio. The concept is
+Velero will take your PV snapshots, stores it on object storage (like S3 or
+Minio). Then, you can restore it to another Kubernetes cluster.
+
+For detail on how the tool works in generic Kubernetes, please reference
+https://blog.kubernauts.io/backup-and-restore-of-kubernetes-applications-using-heptios-velero-with-restic-and-rook-ceph-as-2e8df15b1487[this
+blog post]
+
+Still, there are some limitations with Velero approach. For example:
+
+* It does not support the migration of persistent volumes across cloud
+providers.
+* Velero + Restic currently supports backing up to only S3 compatible object
+storage.
