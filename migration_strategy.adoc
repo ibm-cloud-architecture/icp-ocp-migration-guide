@@ -26,9 +26,9 @@ capacity is made available.
 
 === User Migration
 
-include::./migration/ldap_migration.adoc[]
+include::./migration/ldap_migration.adoc[LDAP Migration]
 
-include::./migration/rbac_migration.adoc[]
+include::./migration/rbac_migration.adoc[RBAC Migration]
 
 
 === Workload Migration
@@ -38,9 +38,9 @@ application BlueCompute that was running on ICP to Openshift.
 
 https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes
 
-include::./migration/container_mod.adoc[]
+include::./migration/container_mod.adoc[Modifying Containers to run in Openshift]
 
-include::./migration/container_scc.adoc[]
+include::./migration/container_scc.adoc[Running Containers using SecurityContextConstraints in Openshift]
 
 ==== DevOps and Developer toolchains
 
