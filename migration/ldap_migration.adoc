@@ -126,8 +126,15 @@ uid: user4
 ....
 
 The ICP configuration appeared as follows:
+ifdef::env-github[]
+:imagesdir: https://github.ibm.com/CASE/openshift-migration-guide/media
+image:image1.png[LDAP settings in ICP]
+endif::[]
 
-image:media/image1.png[image]
+ifndef::env-github[]
+image:./media/image1.png[LDAP settings in ICP]
+endif::[]
+
 
 The matching Openshift configuration was configured under identityProviders on
 each master host in /etc/origin/master/master-config.yaml. Once this was
