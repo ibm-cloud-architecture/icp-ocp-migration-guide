@@ -1,0 +1,83 @@
+==== Modify containers to run as non-root and other mitigations
+
+Following some guidelines here:
+
+https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html
+
+Openshift specific:
+
+https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html#openshift-specific-guidelines
+
+In general, when authoring containers, developers should try run with the least
+privileges as possible.
+
+===== Modifying a container’s USER
+
+If a container’s Dockerfile does not set a USER, then it runs as root by
+default.This is dangerous because root inside a container is also root on the
+host. Openshift prevents containers from running as ``root'' by applying a
+default ``restricted'' SecurityContextConstraint. When a container is started,
+Openshift will randomly select a uid from a range that does not have access to
+anything on the worker node in case a malicious container process is able to
+break out of its sandbox.
+
+In most application scenarios, the actual user a process runs as doesn’t matter,
+but there are some legitimate cases where the container expects to be run as a
+particular user, such as some database containers or other applications where it
+needs to read or write to its local filesystem or to a persistent volume. A
+simple mitigation is to add the USER directive to the Dockerfile before the CMD
+or ENTRYPOINT so that the main container process does not run as root, e.g.
+
+....
+USER 1000
+....
+
+Then making sure the files it modifies contains the correct permissions.
+
+It’s better to provide a numeric value rather than an existing user in
+/etc/passwd in the container’s filesystem, as Openshift will be able to validate
+the numeric value against any SCCs that restrict the uids that a container may
+run as. In the case where we use a third party container and we are not able to
+modify the Dockerfile, or the USER directive refers to a user that corresponds
+to something in /etc/passwd, we can add the securityContext section to the
+podspec to identify the UID that it the pod refers to. For example, in
+BlueCompute the MySQL container we used is from dockerhub, but they allow
+running as USER mysql which corresponds to uid 5984 in /etc/passwd, so we added
+this section to the podSpec in the deployment:
+
+....
+securityContext:
+  runAsUser: 5984
+  runAsGroup: 5984
+  fsGroup: 1000
+....
+
+The fsGroup is useful to provide supplemental groups which are added to the
+container’s processes. For example, in the above case the container process can
+also interact with files owned by group 1000, which might be helpful if using
+existing shared storage where there are directories owned by the group.
+
+==== Modifying a container’s filesystem for read/write
+
+If filesystem access is needed in the container filesystem, then those files
+should be owned by and read/writable by the root group. In Openshift, the
+arbitrary uid used by the "restricted" SCC will be added to the "root" group.
+Directories that must be read to/written from as scratch space may add the
+following to the Dockerfile:
+
+....
+RUN chgrp -R 0 /some/directory && \
+    chmod -R g=u /some/directory
+....
+
+Another strategy that we’ve had success with is to create an emptyDir volume and
+mount it to the directory, which Kubernetes will create and destroy with the
+pod. The emptyDir volume is owned by root but is world writable and can be used
+as local storage for the container. This also helps someone reviewing the pod
+definition identify which directories will be written to.
+
+....
+volumes:
+- emptyDir: {}
+  name: database-storage
+....

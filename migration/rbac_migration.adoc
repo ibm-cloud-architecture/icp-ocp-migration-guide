@@ -1,0 +1,115 @@
+==== User Authorization Migration (RBAC)
+
+Kubernetes ships with some out of box user-facing cluster roles:
+https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
+
+* cluster-admin
+* admin
+* edit
+* view
+
+ICP ships with five additional user-facing cluster roles which correspond to the
+roles used in teams:
+
+* icp:admin
+* icp:edit
+* icp:operate
+* icp:teamadmin
+* icp:view
+
+These are implemented as aggregated roles, which means there are several roles
+where their permissions are union-ed together to provide a full set of
+permissions for the user. The permissions are contained in aggregate roles. Note
+that the admin role contains all of the permissions that the edit role contains,
+etc.
+
+* icp-admin-aggregate
+* icp-edit-aggregate
+* icp-operate-aggregate
+* icp-view-aggregate
+
+Openshift ships with four user-facing cluster roles:
+
+* admin
+* basic-user
+* edit
+* view
+
+Since RBAC is common in both Openshift and ICP, it’s tempting to just export
+these 9 roles to Openshift. However, some Openshift-specific resources are added
+to the Kubernetes out-of-box roles. These are in the ``*.openshift.io''
+apiGroups defined in the roles for the above.
+
+As clusterroles are whitelists of permissions, and access in Kubernetes is a
+union of all of the roles bound to the identity, one potential way of quickly
+migrating permissions is to import the cluster roles from ICP, assign the ICP
+roles to the users and groups, then assign the Openshift ``view'' role to all
+users so that the projects will appear in the CLI and UI. The Openshift ``view''
+role will overlap with the ``icp:view'' role but the Openshift ``view'' role
+will enable view of the Openshift specific resources (e.g. projects, builds,
+etc). This will allow the same access to the Kubernetes API that was assigned in
+ICP. Additional access to Openshift specific objects (e.g. to create a build,
+deployment configs, etc) may be added by assigning Openshift specific roles like
+``edit'', ``admin'', etc.
+
+Here is one team that we created with the following group/user mappings:
+
+....
+$ cloudctl iam team-get dev-1
+Name: dev1
+ID: dev-1
+
+ID      Type    Name    Email   Roles   
+dev1    group   -       -       Viewer   
+user1   user    user1   -       Administrator   
+....
+
+With the following resources assigned:
+
+....
+$ cloudctl iam resources -t dev-1
+CRN   
+crn:v1:icp:private:k8:jkwong-icp-31-cluster:n/dev1:::   
+....
+
+We exported the 9 ICP roles from ICP as yamls, and imported them into openshift.
+
+....
+$ kubectl get clusterroles | grep icp | awk '{print $1}' | xargs -n1 -I{} kubectl get clusterrole {} -o yaml  | tee  all-roles.yaml
+
+...
+
+$ oc apply -f all-roles.yaml
+....
+
+Then we created the associated resources (i.e. the namespace/project) and mapped
+the same permissions using the following commands:
+
+....
+$ oc new-project dev1
+Now using project "dev1" on server "https://console.jkwong-ocp.internal-network.local:443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app centos/ruby-25-centos7~https://github.com/sclorg/ruby-ex.git
+
+to build a new example application in Ruby.
+....
+
+We initially gave access to both of these entities:
+
+....
+$ oc adm policy add-role-to-group view dev1
+role "view" added: "dev1"
+$ oc adm policy add-role-to-user view user1
+role "view" added: "user1"
+....
+
+Next we assigned the ICP role to give the same access that the user had in ICP.
+
+....
+$ oc adm policy add-role-to-group icp:view dev1
+role "icp:view" added: "dev1"
+$ oc adm policy add-role-to-user icp:admin user1
+role "icp:admin" added: "user1"
+....

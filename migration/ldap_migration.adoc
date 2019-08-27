@@ -1,0 +1,301 @@
+==== User Authentication migration – LDAP
+:imagesdir: ../media
+
+Kubernetes does not have users; it’s up to the Kubernetes distribution to
+provide an authentication endpoint that performs user authentication and
+identity mapping to either a User or a Group. Kubernetes does have roles and
+cluster roles, which are used to group permissions, and rolebindings and
+clusterrolebindings, which are used to assign permissions to particular users or
+groups.
+
+For more information about how authentication is implemented in Kubernetes, see:
+
+https://kubernetes.io/docs/reference/access-authn-authz/authentication/
+
+In ICP, the internal auth-idp component is used as an OIDC provider that
+authenticates users. This component can be configured from the UI and will
+connect to LDAP on behalf of the cluster to authenticate users. The ``Teams''
+concept is used to group together users or groups from LDAP into logical groups
+and is managed by the auth-idp component and persisted in mongodb.
+
+Openshift 3.11 has a similar component embedded in the API server that performs
+authentication on behalf of the cluster. However, it does not have a UI to
+configure LDAP, so it takes some work during installation or after installation
+to configure LDAP.
+
+https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider
+
+Openshift 4.x uses a separate operator to perform authentication, and another
+operator manages that operator and its configuration using a
+CustomResourceDefinition to configure LDAP and other identity providers.
+
+https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-ldap-identity-provider.html
+
+In our migration scenario, we specifically we looked at migrating an existing
+ICP LDAP connection to Openshift 3.11.
+
+Our LDAP server had the following contents:
+
+....
+dn: dc=internal-network,dc=local
+dc: internal-network
+objectClass: top
+objectClass: domain
+
+dn: cn=ldapadm,dc=internal-network,dc=local
+objectClass: organizationalRole
+cn: ldapadm
+
+dn: ou=People,dc=internal-network,dc=local
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Group,dc=internal-network,dc=local
+objectClass: organizationalUnit
+ou: Group
+
+dn: cn=binduser,dc=internal-network,dc=local
+cn: binduser
+objectClass: organizationalRole
+objectClass: top
+objectClass: simpleSecurityObject
+
+dn: cn=user1,ou=People,dc=internal-network,dc=local
+cn: user1
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: one
+uid: user1
+
+dn: cn=dev1,ou=Group,dc=internal-network,dc=local
+cn: dev1
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=user1,ou=People,dc=internal-network,dc=local
+uniqueMember: cn=user2,ou=People,dc=internal-network,dc=local
+
+dn: cn=user2,ou=People,dc=internal-network,dc=local
+cn: user2
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: user two
+uid: user2
+
+dn: cn=clusteradmin,ou=People,dc=internal-network,dc=local
+cn: clusteradmin
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: cluster admin
+uid: clusteradmin
+
+dn: cn=admin,ou=Group,dc=internal-network,dc=local
+cn: admin
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=clusteradmin,ou=People,dc=internal-network,dc=local
+
+dn: cn=dev2,ou=Group,dc=internal-network,dc=local
+cn: dev2
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=user3,ou=People,dc=internal-network,dc=local
+uniqueMember: cn=user4,ou=People,dc=internal-network,dc=local
+
+dn: cn=user3,ou=People,dc=internal-network,dc=local
+cn: user3
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: three
+uid: user3
+
+dn: cn=user4,ou=People,dc=internal-network,dc=local
+cn: user4
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: four
+uid: user4
+....
+
+The ICP configuration appeared as follows:
+
+ifdef::env-github[]
+image::image1.png[LDAP settings in ICP]
+endif::[]
+
+ifndef::env-github[]
+image::image1.png[LDAP settings in ICP]
+endif::[]
+
+The matching Openshift configuration was configured under identityProviders on
+each master host in /etc/origin/master/master-config.yaml. Once this was
+configured we restarted docker on each master host to restart the API server.
+The configuration is as follows:
+
+....
+identityProviders:
+  - name: "rhos-ldap"
+    challenge: true
+    login: true
+    mappingMethod: claim
+    provider:
+      apiVersion: v1
+      kind: LDAPPasswordIdentityProvider
+      attributes:
+        id:
+        - dn
+        email:
+        - mail
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: "cn=binduser,dc=internal-network,dc=local"
+      bindPassword: "Letmein"
+      insecure: true
+      url: "ldap://192.168.100.4:389/dc=internal-network,dc=local?uid?sub?(objectclass=person)"
+....
+
+Pay particular interest to the url. The format of the URL is
+
+....
+ldap://host:port/basedn?attribute?scope?filter
+....
+
+We have translated this from the ICP configuration, where ``attribute'' and
+``filter'' are built from the ``User filter'' in the ICP configuration. The
+query it uses is:
+
+....
+(&(attribute=%v)(filter))
+....
+
+Openshift has explicit ``user'' and ``group'' resources which the API server
+manages. You can list them using the familiar ``oc get users'' and ``oc get
+groups'' commands as well as create additional ones.
+
+As Openshift is a developer platform, the default mappingMethod ``claim'' allows
+anybody that successfully authenticates access to the platform to login and
+create projects. When authentication is successful, the platform will create a
+``user'' resource automatically. The ICP model denies access to any users in
+LDAP that are not part of a team. To match the ICP model and deny access to
+anybody not explicitly added to Openshift there are two options:
+
+* use the mappingMethod ``lookup''. However this requires additional overhead as
+the administrator must individually create users in the Openshift platform
+before they are given access to log in to Openshift.
++
+https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LookupMappingMethod
++
+In our case, we created a user for user1, created an identity for it in ldap,
+and then mapped them together:
++
+....
+$ oc create user user1
+user.user.openshift.io/user1 created
+
+$ oc create identity rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local
+identity.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local created
+
+$ oc create useridentitymapping rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local user1
+useridentitymapping.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local created
+....
+* Leave the default mappingMethod ``claim'' but deny access to create new
+projects in Openshift. By default the ``system:authenticated'' group
+(i.e. anybody in LDAP) is given the ``self-provisioner'' cluster-role, which
+allows project creation. Removing the role removes the overhead of having to
+create new users as they log in, but also prevents authenticated users from
+consuming resources in the platform without cluster administrator action. See:
+https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#disabling-self-provisioning
++
+....
+$ oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kubernetes.io/autoupdate": "false" } } }'
+$ oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
+....
+* We think this matches ICP the closest, but allowing users to create projects
+on their own has some advantages in developer scenarios. Using the above policy
+makes sense in production clusters but can be relaxed in development/test
+clusters.
+
+==== Group migration – LDAP
+
+Note that the Openshift api server does not query groups from LDAP; group
+definitions must be synced manually. The documentation around this is here:
+https://docs.openshift.com/container-platform/3.11/install_config/syncing_groups_with_ldap.html
+
+In our scenario we had users in the tree under ou=People, and groups under
+ou=Group. Three groups were created (dev1, dev2, and admins). We used the
+following rfc2307 LDAP sync config:
+
+....
+kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://192.168.100.4:389/dc=internal-network,dc=local
+bindDN: "cn=binduser,dc=internal-network,dc=local"
+bindPassword: "Letmein"
+insecure: true
+rfc2307:
+    groupsQuery:
+        baseDN: "ou=Group,dc=internal-network,dc=local"
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+        filter: "(objectclass=groupOfUniqueNames)"
+    groupUIDAttribute: dn
+    groupNameAttributes: [ cn ]
+    groupMembershipAttributes: [ uniqueMember ]
+    usersQuery:
+        baseDN: "ou=People,dc=internal-network,dc=local"
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+    userUIDAttribute: dn
+    userNameAttributes: [ uid ]
+    tolerateMemberNotFoundErrors: false
+    tolerateMemberOutOfScopeErrors: false
+....
+
+Observe how this maps to the configuration in ICP; the groups are of object
+class ``groupOfUniqueNames'' and the ``uniqueMember'' attribute contains the
+members of the group which will be in turn queried.
+
+Running this command will add some Openshift ``Group'' resources that can be
+assigned roles.
+
+[source,bash]
+----
+$ oc adm groups sync --sync-config=rfc2307_config.yaml  --confirm
+group/dev1
+group/admin
+group/dev2
+----
+
+The result is three groups, with the user mappings as shown.
+
+....
+$ oc get groups
+NAME      USERS
+admin     clusteradmin
+dev1      user1, user2
+dev2      user3, user4
+....
+
+As this is a manual process that produces static user/group mappings, it may be
+required to run this on a schedule that updates and prunes groups in an ongoing
+basis.
+
+One additional implementation note is that Openshift issues Opaque tokens; since
+the authentication module is embedded in the API server it is able to validate
+the tokens internally. In ICP, the authentication token issued by the auth
+service is a signed JWT that contains an embedded list of groups that Kubernetes
+uses to validate permissions. In the next session when we discuss RBAC, we can
+see how rolebindings and clusterrolebindings are bound to these groups.
