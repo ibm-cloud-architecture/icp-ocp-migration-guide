@@ -1,4 +1,5 @@
 ==== User Authentication migration – LDAP
+:imagesdir: ../media
 
 Kubernetes does not have users; it’s up to the Kubernetes distribution to
 provide an authentication endpoint that performs user authentication and
@@ -128,14 +129,12 @@ uid: user4
 The ICP configuration appeared as follows:
 
 ifdef::env-github[]
-:imagesdir: https://raw.github.ibm.com/CASE/openshift-migration-guide/master/media
-image:image1.png[LDAP settings in ICP]
+image::image1.png[LDAP settings in ICP]
 endif::[]
 
 ifndef::env-github[]
-image:./media/image1.png[LDAP settings in ICP]
+image::image1.png[LDAP settings in ICP]
 endif::[]
-
 
 The matching Openshift configuration was configured under identityProviders on
 each master host in /etc/origin/master/master-config.yaml. Once this was
