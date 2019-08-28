@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <meta name="generator" content="Antora 1.1.1">
+    <link rel="stylesheet" href="../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="migration_strategy.html">Migration Strategy</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/ldap_migration.html">User Authentication Migration – LDAP</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/rbac_migration.html">User Authorization Migration - RBAC</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/storage.html">Storage migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/app_resource_migration.html">App resource migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/jenkins_migration.html">Jenkins server migration</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="key_differences.html">Key Differences</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main role="main">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Openshift Migration Guide</a></li>
+    <li><a href="key_differences.html">Key Differences</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///antora/modules/ROOT/pages/key_differences.adoc">Edit this Page</a></div>
+</div>
+<article class="doc">
+<div class="sect2">
+<h3 id="_key_differences_between_icp_and_openshift"><a class="anchor" href="#_key_differences_between_icp_and_openshift"></a>Key differences between ICP and OpenShift</h3>
+<div class="paragraph">
+<p>IBM Cloud Private (ICP) and Red Hat OpenShift are different Kubernetes
+distributions. Fundamentally, both are based on the core Kubernetes
+technologies. Thus, they bring relatively consistent experience for application
+development and platform operation. From migration perspective, we’ll focus on
+the key differences between the two platforms.</p>
+</div>
+<!-- toc disabled -->
+<div class="paragraph">
+<p>The following is the summary of the key differences:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top"><strong>ICP</strong></th>
+<th class="tableblock halign-left valign-top"><strong>OpenShift</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Migration Effort</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Infrastructure</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hardware</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x86_64Power (ppc64le)IBM Z</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X86_64Power</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Z is large migration effort,
+OpenShift generally runs wherever RHEL runs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operating System</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Red Hat Enterprise Linux 7.3, 7.4, 7.5Ubuntu 18.04 LTS and
+16.04 LTSSUSE Linux Enterprise (SLES) 12</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RHELRed Hat CoreOS (RHCOS)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Migrating
+from Ubuntu / Suse to OpenShift, customer may require operation procedure change
+such as OS patching, security certification etc.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IaaS provider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMWare/OpenStackMost public cloud IaaS providers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMWare/OpenStackMost of the public cloud IaaS providerIBM Cloud and Azure
+provide managed OpenShift service</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Need to pay attention on the networking and
+storage for the specific IaaS provider, as well as any automation code specific
+to an IaaS provider</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HA Cluster Topology</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MasterProxyManagementVA</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MasterWorker</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Migration effort
+should be part of the OpenShift planning and installation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Installation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ansible installer Delivered as Docker image</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ansible installer
+(v4.x completely changed the installation procedure with Operator) Delivered as
+RPM or Docker image</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Installation procedure particularly any automation script
+requires significant change</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container Registry</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ICP private registryExternal Docker Registry</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift
+Container Registry (OCR)External Docker Registry</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes Version</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes is generally stable after 1.9 but there
+are some features (e.g. storage-related) that are beta in 1.11</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Development</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Local dev environment</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vagrant based local ICP cluster with ICP Community
+edition</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MinishiftAll-in-one OKD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Development Layer</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Projects</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Provides higher level Kubernetes construct
+simplifying deployments.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Development tools</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Standard KubernetesMicroprofile</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Standard
+KubernetesSource-to-image (S2I)fabric8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not too much needs to done for
+developers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DevOps</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Platform neutral DevOps toolchain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Packaged Jenkins for CIImageStream
+for container images2i</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Large effort.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Application package</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Standard Kubernetes yamlHelmOperator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Standard Kubernetes
+yamlOpenShift templateOpenShift ApplicationOperator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium to large effort</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deployment</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Standard Kubernetes deployment and strategy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift opionated
+DeploymentConfig and ImageStream</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Suggest to keep the Kubernetes standard
+approach. Small effort</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Operation</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Command Line Tool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">kubectl</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">oc (superset of kubetl)kubectl</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort when
+cli is used any operation or devops automation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User interface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ICP UI</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift UI</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi-tenancy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Standard Kubernetes namespace and RBAC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift Project with
+RBACOperator can apply Quotas and limit per project or cluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium effort</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Networking</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDN (Software Defined Network)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default on CalicoSupport other Kubernetes
+supported SDN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default to Red Hat Open vSwitch SDNCan use other Kubernetes
+supported SDN as well</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort. Most of these are internal to ICP and
+OpenShift</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cluster DNS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CoreDNS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SkyDNS (3.x)CoreDNS (4.x)</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External Access for Services</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ingress ControllerLoad Balancer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Router
+(HAProxy)Load Balancer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medium effort to update the service exposure</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Storage</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">File Storage</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GlusterFSNFS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GlusterFSNFSCeph</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Security</strong></p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container permission</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allows to run container as root</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Forbids to run a
+container as root by default (best practice)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort to rebuild the
+application container</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authentication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenID with primarily LDAP identify provider</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OAuth with
+identity providerOpenShift supports different kinds of IAM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authorization</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RBAC as aboveKubernetes called Pod Security Policies (PSP) beta</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RBAC as aboveOpenShift Security Context Constraint (SCC)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort, some
+changes needed in particular to address the SCC</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Securing the master</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TLS to masterX.509 certifate or token to access API server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TLSX.509 certifate or token to access API serverProject quota to limit the
+token rate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Small effort</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>For further reading, you can check this blog published earlier
+<a href="https://apps.na.collabserv.com/blogs/ca5e7833-78b8-481c-8a14-ba70b22a20ce/entry/Comparing_IBM_Cloud_Private_ICP_with_RedHat_OpenShift?lang=en_us" class="bare">https://apps.na.collabserv.com/blogs/ca5e7833-78b8-481c-8a14-ba70b22a20ce/entry/Comparing_IBM_Cloud_Private_ICP_with_RedHat_OpenShift?lang=en_us</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_development_experience"><a class="anchor" href="#_development_experience"></a>Development Experience</h3>
+<div class="sect3">
+<h4 id="_openshift_development_environment"><a class="anchor" href="#_openshift_development_environment"></a>OpenShift Development Environment</h4>
+<div class="paragraph">
+<p>The goal of OpenShift is to provide a great experience for both Developers and
+System Administrators to develop, deploy, and run containerized applications.
+Developers should love using OpenShift because it enables them to take advantage
+of both containerized applications and orchestration without having to know the
+details. Developers are free to focus on their code instead of spending time
+writing Dockerfiles and running docker builds.</p>
+</div>
+<div class="paragraph">
+<p>OpenShift is a full platform that incorporates several upstream projects while
+also providing additional features and functionality to make those upstream
+projects easier to consume. The core of the platform is containers and
+orchestration. For the container side of the house, the platform uses images
+based upon the docker image format. For the orchestration side, it is based on
+upstream Kubernetes project. Beyond these two upstream projects, there are a set
+of additional Kubernetes objects such as routes and deployment configs.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_standard_interfaces_differences_oc_tool_usage_vs_kubectl_and_helm"><a class="anchor" href="#_standard_interfaces_differences_oc_tool_usage_vs_kubectl_and_helm"></a>Standard Interfaces Differences (oc tool usage vs. kubectl and HELM)</h4>
+<div class="paragraph">
+<p>Both Developers and Operators communicate with the OpenShift Platform via one of
+the following methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Command Line Interface:</strong> <em>The command line tool that we will be using as part
+of this training is called the <strong>oc </strong>tool.</em> This tool is written in the Go
+programming language and is a single executable that is provided for Windows, OS
+X, and the Linux Operating Systems.</p>
+</li>
+<li>
+<p><strong>A Web Console:</strong> User friendly graphical interface</p>
+</li>
+<li>
+<p><strong>REST API:</strong> Both the command line tool and the web console actually
+communicate to OpenShift via the same method, the REST API. Having a robust API
+allows users to create their own scripts and automation depending on their
+specific requirements. For detailed information about the REST API, check out
+the official documentation
+at: https://docs.openshift.org/latest/rest_api/index.html[<a href="https://docs.OpenShift.org/latest/rest_api/index.html" class="bare">https://docs.OpenShift.org/latest/rest_api/index.html</a>]</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>IBM Cloud Private also provides a CLI. Many interactions with ICP though happen
+through the standard Kubernetes CLI called <strong>kubectl.</strong> Developers also made use
+of <strong>HELM</strong> as a package manager to deploy workloads. Whereas the pattern for ICP
+developers was to make heavy use of kubectl or HELM to deploy workloads and
+applications, OpenShift users often make more use of the <strong>oc</strong> commandline tool
+than kubectl. (<em>Note: HELM can be used in OpenShift environment but it must be
+installed into OpenShift. IBM Cloud Paks provide this ability as a core service
+over OpenShift</em>).</p>
+</div>
+<div class="paragraph">
+<p>OpenShift aims to greatly simplify development and deployment of applications,
+thus providing a layer over Containers (much like a Cloud Foundry would), and
+the <strong>oc tool</strong> provides those tools.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_projects"><a class="anchor" href="#_projects"></a>Projects</h4>
+<div class="paragraph">
+<p>OpenShift is often referred to as a container application platform in that it is
+a platform designed for <strong><em>the development and deployment of containers.</em></strong></p>
+</div>
+<div class="paragraph">
+<p>To contain your application, OpenShift use <strong>projects</strong>. The reason for having a
+project to contain your application is to allow for controlled access and quotas
+for developers or teams. More technically, it&#8217;s a visualization of the
+Kubernetes namespace based on the developer access controls. Under the hood,
+while <code>project'' is a separate object returned by the OpenShift API, there is a
+one-to-one mapping between </code>projects'' and ``namespaces'' in Kubernetes.</p>
+</div>
+<div class="paragraph">
+<p>The typical experience goes something like:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Developer logs in to the console or CLI and creates a project</p>
+</li>
+<li>
+<p>Add artifacts to project. This can take several forms, for example</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Deploy an existing Image (usually Docker based) and with optionally
+additional YAML files.</p>
+</li>
+<li>
+<p>Create an application out of templates.</p>
+</li>
+<li>
+<p>Create pipelines out of several approaches. (OpenShift has a built in
+mechanism called Source 2 Image, of s2i that can deploy straight from a git
+repository)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Configure resources.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Items include exposing a Route (Described later in the article)</p>
+</li>
+<li>
+<p>Scale Pods.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When you create a Project and add a deployment, several of the Kubernetes
+Objects are created for you by default. This includes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Pods:</strong> Where your containers run which you can begin to scale immediately.</p>
+</li>
+<li>
+<p><strong>Services:</strong> provide internal abstraction and load balancing within an
+OpenShift environment, but sometimes clients (users, systems, devices,
+etc.) <strong>outside</strong> of OpenShift need to access an application.</p>
+</li>
+<li>
+<p><strong>Routes:</strong> The way that external clients are able to access applications
+running in OpenShift. (Similar to Ingress or Node Ports).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A great way to get started with the development experience is through the
+following website. <a href="https://learn.openshift.com/">https://learn.OpenShift.com/</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_migration_of_applications_from_icp_to_openshift"><a class="anchor" href="#_migration_of_applications_from_icp_to_openshift"></a>Migration of applications from ICP to OpenShift.</h4>
+<div class="paragraph">
+<p>There are actually many paths you can take to do this.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Install HELM either through open source or through IBM Cloud Paks. An example
+of this is here
+(<a href="https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/tree/spring#deploy-bluecompute-to-an-openshift-cluster">https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/tree/spring#deploy-bluecompute-to-an-OpenShift-cluster</a>)</p>
+</li>
+<li>
+<p>Take existing Docker Images and applications, update YAML, and create a
+project with the oc tool. You can then use one of the mechanisms described
+earlier. This will require you to update existing CI/CD pipleines but moves you
+closer to the OpenShift environment.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_development_environments"><a class="anchor" href="#_development_environments"></a>Development Environments</h4>
+<div class="paragraph">
+<p>OpenShift developers can use several approaches to local development.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Develop code and Docker images locally and deploy to a remote cluster. There
+are several ``managed OpenShift Options'' on various public clouds.</p>
+</li>
+<li>
+<p>If you need to run a local kubrnetes distribution you can use.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Minikube:</strong> This is the standard community Kubernetes. However, this will
+require you maintain duplicate YAML artifacts. This approach is not recommended.</p>
+</li>
+<li>
+<p><strong>OKD:</strong> This is the Origin Community Distribution that powers OpenShift. You
+can access it here: <a href="https://www.okd.io/" class="bare">https://www.okd.io/</a><span class="[.underline"><a href="https://www.okd.io/" class="bare">https://www.okd.io/</a></span>]. OKD
+provides a feature complete version of OpenShift.</p>
+</li>
+<li>
+<p><strong>Minishift</strong> is a tool that helps you run OKD locally by launching a
+single-node OKD cluster inside a virtual machine. With Minishift you can try out
+OKD or develop with it, day-to-day, on your local machine. You can run Minishift
+on the Windows, macOS, and GNU/Linux operating systems. More information can be
+found here: <a href="https://www.okd.io/minishift/" class="bare">https://www.okd.io/minishift/</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>OpenShift is not opinionated on the application stack and provides templates for
+various popular OpenSource frameworks such as Spring, Java EE, JBoss, Quarkus,
+Node, etc…. A great place to learn about various types of applications you can
+build is here:
+<a href="https://learn.openshift.com/middleware/">https://learn.OpenShift.com/middleware/</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_additional_tools_cli_s_and_frameworks"><a class="anchor" href="#_additional_tools_cli_s_and_frameworks"></a>Additional tools, CLI’s, and Frameworks</h4>
+<div class="paragraph">
+<p>In addition to the oc tool, there are several more CLI’s, tools, and frameworks
+that you should be aware of.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>odo:</strong> a CLI tool for developers who are writing, building, and deploying
+applications on OpenShift. With odo, developers get an opinionated CLI tool that
+supports fast, iterative development. odo abstracts away Kubernetes and
+OpenShift concepts so developers can focus on what&#8217;s most important to them:
+code. odo was created to improve the developer experience with OpenShift.
+Existing tools such as oc are more operations-focused and require a deep
+understanding of Kubernetes and OpenShift concepts. More information can be
+found here: <a href="https://openshiftdo.org/">https://OpenShiftdo.org/</a></p>
+</li>
+<li>
+<p><strong>Source-to-Image (S2I):</strong> Source-to-Image (S2I) is a toolkit and workflow for
+building reproducible container images from source code. It is worth noting that
+you can use any CI / CD tool with OpenShift as well. More information can be
+found here:
+<a href="https://github.com/openshift/source-to-image">https://github.com/OpenShift/source-to-image</a>.
+We will discuss this more in the next section.</p>
+</li>
+<li>
+<p><strong>CodeReady:</strong> Built on the open Eclipse Che project, Red Hat CodeReady
+Workspaces provides developer workspaces, which include all the tools and the
+dependencies that are needed to code, build, test, run, and debug applications.
+More information can be found here:
+<a href="https://developers.redhat.com/products/codeready-workspaces/overview" class="bare">https://developers.redhat.com/products/codeready-workspaces/overview</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>OpenShift developers can also use popular projects such as ISTIO, kNative, and
+others on the platform</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>ISTIO</strong> is a service mesh that provides features such as routing, secure
+communication, Circuit Breaker, and Application diagnostic tools. Istio is
+supported throught he OpenShift Service Mesh offering, which is a Tech Preview
+and will be GA at the end of Aug 2019. To learn how to use ISTIO on OpenShift,
+go here:
+<a href="https://learn.openshift.com/servicemesh/">https://learn.OpenShift.com/servicemesh/</a></p>
+</li>
+<li>
+<p><strong>Knative</strong> extends Kubernetes to provide components for building, deploying,
+and managing serverless applications</p>
+</li>
+<li>
+<p><strong>Tekton</strong> is a cloud-native CI/CD framework where pipeline stages are executed
+in containers. Tekton is part of the OpenShift Pipelines offering. For more
+information go here:
+<a href="https://blog.openshift.com/cloud-native-ci-cd-with-openshift-pipelines/">https://blog.OpenShift.com/cloud-native-ci-cd-with-OpenShift-pipelines/</a></p>
+</li>
+<li>
+<p><strong>Operators</strong> are a framework for building Kubernetes-native applications. Red
+Hat provides and SDK for getting up and running on creating Operators from Helm
+charts, Ansible playbooks, and go code. For more information see:
+<a href="https://github.com/operator-framework/getting-started" class="bare">https://github.com/operator-framework/getting-started</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ibm_cloud_pak_for_applications_and_additional_open_source_projects"><a class="anchor" href="#_ibm_cloud_pak_for_applications_and_additional_open_source_projects"></a>IBM Cloud Pak for Applications and additional Open Source projects</h4>
+<div class="paragraph">
+<p>IBM announced the <a href="https://www.ibm.com/cloud/cloud-pak-for-applications">Cloud Pak
+for Applications</a> which includes support for IBM application runtimes such as
+IBM WebSphere Liberty and middleware such as IBM MobileFirst Foundation</p>
+</div>
+<div class="paragraph">
+<p>It also includes various recently-announced open source projects maintained by
+IBM around developer tooling. These include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>[<strong>Kabanero</strong>]: <a href="https://kabanero.io" class="bare">https://kabanero.io</a>, which consists of CodeWind
+<a href="https://codewind.dev" class="bare">https://codewind.dev</a> for IDE extensions to developer tools like Eclipse and
+VSCode, and Appsody <a href="https://appsody.dev" class="bare">https://appsody.dev</a> for building templates for popular
+runtimes</p>
+</li>
+<li>
+<p><strong>Razee</strong> <a href="https://razee.io" class="bare">https://razee.io</a> for Continuous Deployment</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The IBM Cloud Pak for Applications is still in development and may include more
+components in the future.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_devops"><a class="anchor" href="#_devops"></a>DevOps</h3>
+<div class="paragraph">
+<p>As mentioned earlier, OpenShift provides an opinionated development platform
+around source-to-image (S2I) as a differentiator over upstream community
+Kubernetes. As a comparison to ICP, it was not opinionated on DevOps beyond
+providing (outdated) community Helm Charts for Jenkins. S2I is an integrated
+build and deployment framework that developers can use to run code in containers
+in the platform without additional infrastructure.</p>
+</div>
+<div class="paragraph">
+<p>Note that if DevOps procedures are already mature and not tied to the platform,
+and infrastructure is outside of the platform, it’s possible to reuse most of it
+as OpenShift conforms to Kubernetes. There are some minor differences around
+security which are discussed later in this document.</p>
+</div>
+<div class="paragraph">
+<p>That said, a large part of OpenShift value proposition is that it’s an
+integrated development platform in addition to being a container orchestrator.
+OpenShift includes some CustomResourceDefinitions (CRDs) around continuous
+integration (CI) and continuous deployment (CD) that enhance developer
+productivity. As the controllers for these objects are built-in to the OpenShift
+API, they are not portable outside of OpenShift.</p>
+</div>
+<div class="sect3">
+<h4 id="_imagestream"><a class="anchor" href="#_imagestream"></a>ImageStream</h4>
+<div class="paragraph">
+<p>An ImageStream represents an image either in the internal OpenShift container
+image registry, or in an external registry. An image in an external registry can
+be mirrored and cached in the local container image registry.</p>
+</div>
+<div class="paragraph">
+<p>There are a few related resources to ImageStreams:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The ImageStream resource represents the repository part of the image</p>
+</li>
+<li>
+<p>The ImageStreamTag resource represents an individual tag, which points at the
+hash of the image as stored in the registry. This hash is immutable and every
+push to the tag will update the hash, assuming the image has changes.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For example, if we were to import docker.io/ibmcom/websphere-liberty:latest, the
+ImageStream part would be <code>docker.io/ibmcom/websphere-liberty'', and the tag
+would be </code>latest''. The ImageStreamTag would represent the pointer to the image
+represented by ``docker.io/ibmcom/websphere-liberty:latest'', which changes
+every time someone pushes to the ibmcom/websphere-liberty:latest tag.</p>
+</div>
+<div class="paragraph">
+<p>OpenShift will deploy the image hash in deployments and the ImageStreamTag
+tracks the upstream images as they change. As such, we can use ImageStreams to
+track changes to images even if the image in the original tag changes.</p>
+</div>
+<div class="paragraph">
+<p>Images in external registries can be imported into OpenShift as ImageStreams,
+and mirrored on a schedule. ImageStream changes can trigger builds or
+redeployments; this can be useful in cases such as triggering rebuilds on a
+nightly patched image updates for base images, or as part of a continuous
+deployment procedure where image tags are used to track image deployments to
+certain environments.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, since the ImageStream objects are stored in OpenShift/Kubernetes,
+RBAC can be applied to them and they can be scoped to individual projects or
+shared to multiple projects. This is similar to how ICP manages RBAC around
+images as well in its private registry.</p>
+</div>
+<div class="paragraph">
+<p>View the FAQ on the ImageStream here:
+<a href="https://blog.openshift.com/image-streams-faq/">https://blog.OpenShift.com/image-streams-faq/</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_buildconfig"><a class="anchor" href="#_buildconfig"></a>BuildConfig</h4>
+<div class="paragraph">
+<p>For Continuous Integration, the BuildConfig is a CustomResource is used to
+produce a target image based on inputs and triggers. The BuildConfig takes as
+input:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Source code (such as a git repository) or binaries, (for example, a directory
+as part of an external pipeline)</p>
+</li>
+<li>
+<p>Source ImageStream (for example a base image like ibmcom/websphere-liberty)</p>
+</li>
+<li>
+<p>Target ImageStream which contains the built application artifact</p>
+<div class="paragraph">
+<p>There are various strategies around BuildConfig, which control how the target
+image stream is assembled:</p>
+</div>
+</li>
+<li>
+<p>Source strategy: this is the core of S2I where a builder image is provided
+that builds the source and packages it into a target container image, then
+pushes it into the OpenShift private registry. This requires the builder image
+to have knowledge about how to turn code into a container image. For example,
+for Java code, the builder image may run ``mvn package'', take the output
+binaries and build an image from a Java runtime. Red Hat ships several builder
+images for popular runtimes, but any custom runtimes or deviations from the
+happy path may require additional work to support. Red Hat provides an
+SDK/documentation on how to build custom builder images here:
+<a href="https://github.com/openshift/source-to-image">https://github.com/OpenShift/source-to-image</a></p>
+</li>
+<li>
+<p>Docker strategy: this is equivalent to running <code>docker build'' on a local
+machine, except it is done through OpenShift. As part of this, the context
+directory and a Dockerfile are uploaded to OpenShift where it the container
+image is assembled from binaries. There are advantages to this, mainly that in
+some CI scenarios in multi-tenant environments where the administrators do not
+want to expose docker socket for direct </code>docker build'', as this exposes root
+access on the machine where the container is assembled.</p>
+</li>
+<li>
+<p>Pipeline strategy: this is equivalent to creating a staged build pipeline
+through Jenkins. In this BuildConfig type, an embedded Jenkins declarative
+pipeline is defined in the body of the resource. OpenShift will provision an
+instance of Jenkins in the project to execute the build and will sync the build
+status from Jenkins to the Build object (more on it below). The OpenShift
+Application console contains some UI elements that show the build status from
+Jenkins.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An instance of an execution of BuildConfig is a Build. Builds can be triggered
+when the upstream source is changed, when the source ImageStream changes, or
+manually using "oc new-build". An execution of BuildConfig results in a new
+Build object being created, which has a build number that increments every time
+the build is run. BuildConfig can maintain build history for both successful and
+unsuccessful builds. The build itself is run in a build pod.</p>
+</div>
+<div class="paragraph">
+<p>For more information, see here:
+<a href="https://docs.openshift.com/container-platform/3.11/dev_guide/builds/index.html">https://docs.OpenShift.com/container-platform/3.11/dev_guide/builds/index.html</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_deploymentconfig"><a class="anchor" href="#_deploymentconfig"></a>DeploymentConfig</h4>
+<div class="paragraph">
+<p>OpenShift has DeploymentConfigs, which is a precursor to the Kubernetes
+Deployments. The DeploymentConfig resource is not portable to non-OpenShift
+Kubernetes distributions. Note that OpenShift also supports the familiar
+Deployment resource as well, so in terms of moving from ICP or other Kubernetes
+distributions, offers basically zero migration effort and is more
+community-friendly.</p>
+</div>
+<div class="paragraph">
+<p>DeploymentConfig does provide deeper integration with ImageStreams, in that when
+an ImageStream is updated, OpenShift can perform an update of the Deployment.
+OpenShift can also extend this integration with ImageStreams to regular
+Deployments by configuration, see
+<a href="https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#using-is-with-k8s">https://docs.OpenShift.com/container-platform/3.11/dev_guide/managing_images.html#using-is-with-k8s</a>.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, DeploymentConfig supports a few advanced deployment strategies,
+which are detailed here:
+<a href="https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/deployment_strategies.html">https://docs.OpenShift.com/container-platform/3.11/dev_guide/deployments/deployment_strategies.html</a>.
+Most notably, they claim support for ``canary'' deployments, although the
+documentation suggests the regular rolling update is a form of canary deployment
+(which it isn’t, as the deployment continues to get rolled over as soon as the
+health checks pass). There is also support for A/B testing and blue-green
+deployments.</p>
+</div>
+<div class="paragraph">
+<p>There are additional features and differences between Deployments and
+DeploymentConfigs in OpenShift. When a DeploymentConfig rolls out a deployment,
+a <code>deploy'' pod is created that performs the actual deployment, as opposed to a
+controller running on the master performing the rollout. This may be slightly
+more scalable in very large clusters where many rolling deployments are
+happening simultaneously. Additionally, rollouts may be paused and resumed as
+needed. Also, a handy command is the </code>oc rollout latest'', which just
+re-deploys the same version of the pod; this is useful if a ConfigMap has
+changed and the pods need to restart to refresh them.</p>
+</div>
+<div class="paragraph">
+<p>For more information, see here:
+<a href="https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html">https://docs.OpenShift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_templates"><a class="anchor" href="#_templates"></a>Templates</h4>
+<div class="paragraph">
+<p>OpenShift provides support for Template resources, which are regular OpenShift
+objects with parametrized fields in them. This is similar to Helm template, but
+without the advanced ability to generate random data, conditionals, or complex
+variable types.</p>
+</div>
+<div class="paragraph">
+<p>The ``oc process'' command is used to convert a template to a regular resource.
+The Template is a list of one or more templated resources, and can be stored in
+the OpenShift API for re-use, or processed from local filesystem. Templates form
+the base for the "oc new-app" command which generates a list of resources from a
+list of parameters.</p>
+</div>
+<div class="paragraph">
+<p>Again, as templates are very OpenShift specific, use discretion before using.
+There are several other open-source Kubernetes templating projects, for example
+Helm and Kustomize, that are more portable and more community-friendly.
+Generally Red Hat frowns upon Helm 2.x as server side tiller requires large
+permissions and the helm client requires read access to the namespace where
+tiller runs; Helm 3 addresses this by including tiller on client side.</p>
+</div>
+<div class="paragraph">
+<p>See here for more information:
+<a href="https://docs.openshift.com/container-platform/3.11/dev_guide/templates.html">https://docs.OpenShift.com/container-platform/3.11/dev_guide/templates.html</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_infrastructure"><a class="anchor" href="#_infrastructure"></a>Infrastructure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter explores the infrastructure consideration when migrating from ICP
+to OpenShift. It covers the hardware platform, IaaS and hypervisors, operating
+system and platform automation.</p>
+</div>
+<div class="sect2">
+<h3 id="_hardware_and_hypervisor"><a class="anchor" href="#_hardware_and_hypervisor"></a>Hardware and hypervisor</h3>
+<div class="paragraph">
+<p>ICP can be deployed on (Linux) x86_64, Power (ppc64le) and IBM Z and LinuxOne.
+OpenShift now can run x86_64 and Power hardware. Each has its own sizing
+recommendation in terms of CPU, memory and disk space. You can reference the
+system requirement for both below:</p>
+</div>
+<div class="paragraph">
+<p>ICP (3.2) hardware requirement guide -
+<a href="https://www.ibm.com/support/knowledgecenter/SSBS6K_3.2.0/supported_system_config/hardware_reqs.html" class="bare">https://www.ibm.com/support/knowledgecenter/SSBS6K_3.2.0/supported_system_config/hardware_reqs.html</a></p>
+</div>
+<div class="paragraph">
+<p>OpenShift (3.11) hardware requirement -
+<a href="https://docs.openshift.com/container-platform/3.11/install/prerequisites.html#hardware">https://docs.OpenShift.com/container-platform/3.11/install/prerequisites.html#hardware</a></p>
+</div>
+<div class="paragraph">
+<p>Both ICP and OpenShift can run on Hypervisors like VMware, OpenStack and Hyper-V
+in a private cloud environment. ICP is also supported on IBM PowerVC.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_iaas"><a class="anchor" href="#_iaas"></a>IaaS</h3>
+<div class="paragraph">
+<p>Both ICP and OpenShift can run on public or private IaaS. In public. We have
+tested ICP on IBM Cloud, Azure, AWS, GCP, and Huawei Cloud. On the other hand,
+we have tested OpenShift on IBM Cloud, Azure, AWS.</p>
+</div>
+<div class="paragraph">
+<p>For OpenShift on public cloud, there are potentially 3 offering:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Managed OpenShift cluster. This includes IBM IKS managed OpenShift (beta) and
+Azure Managed OpenShift</p>
+</li>
+<li>
+<p>Guided-provision OpenShift cluster. The IaaS vendors provide guided automation
+procedure to provision a full OpenShift cluster either through UI or automation
+scripts. For example, Azure OpenShift cluster and AWS OpenShift quickstart.</p>
+</li>
+<li>
+<p>Build your own cluster. End user provisions IaaS VMs (or bare metal), then
+install OpenShift on top of the VMs.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ICP doesn’t have a managed edition.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_operating_system"><a class="anchor" href="#_operating_system"></a>Operating System</h3>
+<div class="paragraph">
+<p>This is where you should pay the most attention when migrating from ICP.</p>
+</div>
+<div class="paragraph">
+<p>Both platforms can only run on top of Linux OS. ICP supports Red Hat Enterprise
+Linux (RHEL) 7.3, 7.4 and 7.5, Ubuntu 18.04 LTS and 16.04 LTS, SUSE Linux
+Enterprise (SLES) 12. While OpenShift supports only RHEL 7.4 or later in 3.x, or
+Red Hat Enterprise Linux CoreOS (RHCOS) in release 4.x. In OpenShift Container
+Platform 4.1, you must use RHCOS for all masters, but you can use Red Hat
+Enterprise Linux (RHEL) as the operating system for compute, or worker,
+machines. If you choose to use RHEL workers, you must perform more system
+maintenance than if you use RHCOS for all of the cluster machines.</p>
+</div>
+<div class="paragraph">
+<p>What does this mean is that you need to switch RHEL or RHCOS when migrating ICP
+running on Ubuntu or Suse Linux. Most of this is infrastructure related Ops
+activity.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_storage"><a class="anchor" href="#_storage"></a>Storage</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_security"><a class="anchor" href="#_security"></a>Security</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_selinux"><a class="anchor" href="#_selinux"></a>SELinux</h3>
+<div class="paragraph">
+<p>OpenShift requires SELinux to be <code>enforcing'' and </code>targeted'' mode. When
+containers are run, the container image’s filesystem is labeled using a random
+label and the container processes are labeled the same way, so that only the
+container processes can access its own filesystem and no other processes. Any
+mounted filesystems (secrets, configmaps, or volumes) will have an SELinux
+policy applied to them to allow the container to read and write to them.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_podsecuritypolicy_vs_securitycontextconstraints"><a class="anchor" href="#_podsecuritypolicy_vs_securitycontextconstraints"></a>PodSecurityPolicy vs SecurityContextConstraints</h3>
+<div class="paragraph">
+<p>OpenShift SecurityContextContsraints (SCC) is the pre-cursor to the
+PodSecurityPolicy (PSP) in upstream community Kubernetes. As such, a lot of the
+properties of the PSP come directly from the SCC. These objects are
+cluster-scoped policies designed to limit the access of containers to the host
+kernel. Most containers do not need to privileged access to the host and should
+as a best practice not depend on the uid of the user owning the container
+process. However, many containers on DockerHub and even some IBM middleware
+require running as root or some other capabilities in order to function.</p>
+</div>
+<div class="paragraph">
+<p>One important thing to note is that while the PodSecurityPolicy objects can be
+created in OpenShift, the platform will ignore these objects and only enforces
+the SecurityContextConstraints objects. OpenShift ships with some out of the box
+SCCs, the default <code>restricted'' policy is the most restrictive, and the
+</code>privileged'' policy is the most open.</p>
+</div>
+<div class="paragraph">
+<p>One very large difference is that the default policy in OpenShift will generate
+random a uid/gid from a range for the container process to run as (the
+<code>restricted'' policy), and if your container depends on a specific uid/gid
+being set, the container may not run. One common example is if container
+requires reads or writes to the local filesystem as a specific user. In this
+case, the </code>nonroot'' SCC seems to match the ``ibm-restricted-psp'' default
+policy that ICP ships with.</p>
+</div>
+<div class="paragraph">
+<p>Here is a comparison of the out-of-box SCCs to those shipped with ICP, as well
+as some brief comments:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 34%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"><strong>OpenShift</strong></th>
+<th class="tableblock halign-left valign-top"><strong>ICP</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Comments</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">anyuid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ibm-anyuid-psp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container is allowed to run as any uid, including root,
+but within restricted SELinux context</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hostaccess</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(n/a)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container is allowed to access host namespaces (i.e. can
+mount filesystem and network of the host), but must run as random non-root user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(n/a)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ibm-anyuid-hostaccess-psp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container is allowed to access host
+namespaces (i.e. can mount filesystem, access host network, and access any other
+namespaced resources on the host), and may run as any user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hostmount-anyuid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ibm-anyuid-hostpath-psp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container is allowed to run as any
+user and can mount host directories</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">hostnetwork</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(n/a)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container can run on the host network, but must run as
+random selected non-root user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">nonroot</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ibm-restricted-psp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Container can run as any user except root; this is
+useful for containers that expect to run as a particular UID from its local
+/etc/passwd</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">privileged</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ibm-privileged-psp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Run as any user and have access to any host
+features. This is essentially running as root right on the worker node and
+should be used sparingly</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">restricted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(n/a)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(OpenShift Default) Denies access to most host features and
+must run as random-selected uid.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>In order for a pod to be able to run with additional access to the host system,
+it’s necessary to apply the SCC to the service account the pod executes as. One
+subtle difference between SCC and PSP is the RBAC around it; SCCs have a
+<code>users'' property that lists the entities allowed to use the SCC while PSPs are
+controlled with roles and rolebindings. You can use the following command to
+apply the SCC to a service account, which under the covers adds the service
+accounts to the </code>users'' property of the SCC.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc adm policy add-scc-to-user &lt;scc&gt; system:serviceaccount:&lt;namespace&gt;:&lt;serviceaccount&gt;
+oc adm policy remove-scc-from-user &lt;scc&gt; system:serviceaccount:&lt;namespace&gt;:&lt;serviceaccount&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_identity_providers"><a class="anchor" href="#_identity_providers"></a>Identity Providers</h3>
+<div class="paragraph">
+<p>OpenShift supports one or more Identity Providers as user directory sources for
+authentication. As OpenShift is a development platform, the default behavior is
+that any user that can authenticate to OpenShift is able to create a project
+(mappingMethod <code>claim''). This behavior can be changed during installation or
+after installation by using mappingMethod </code>lookup'', the downside is that the
+administrator must manually add user resources to OpenShift before they will be
+authorized to use the platform.
+<a href="https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LookupMappingMethod">https://docs.OpenShift.com/container-platform/3.11/install_config/configuring_authentication.html#LookupMappingMethod</a>
+for more information.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_role_based_access_control"><a class="anchor" href="#_role_based_access_control"></a>Role-based Access Control</h3>
+<div class="paragraph">
+<p>As Kubernetes RBAC was submitted upstream by Red Hat from OpenShift features,
+much of the RBAC in ICP is largely the same in ICP and OpenShift. Roles and
+ClusterRoles are groups of permissions on objects in the Kubernetes API.
+RoleBindings and ClusterRoleBindings are objects that bind roles to identities
+to access those permissions. Users, groups, and service accounts may have
+multiple role bindings which aggregated together gives them an access list of
+parts of the platform they may access.</p>
+</div>
+<div class="paragraph">
+<p>One shortcut around assigning roles/cluster roles to users exists in the oc CLI,
+which under the covers creates a RoleBinding or ClusterRoleBinding, instead of
+the awkward <code>kubectl create rolebinding'' and </code>kubectl create
+clusterrolebinding'' commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc adm policy add-role-to-user &lt;role&gt; &lt;user&gt;
+oc adm policy add-cluster-role-to-user &lt;role&gt; &lt;user&gt;
+oc adm policy remove-role-from-user &lt;role&gt; &lt;user&gt;
+oc adm policy remove-cluster-role-from-user &lt;role&gt; &lt;user&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_imagepolicy"><a class="anchor" href="#_imagepolicy"></a>ImagePolicy</h4>
+<div class="paragraph">
+<p>OpenShift also contains an image policy, although it is not stored as a Custom
+Resource as it is in ICP. This can be configured on the master nodes. See:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/admin_guide/image_policy.html">https://docs.OpenShift.com/container-platform/3.11/admin_guide/image_policy.html</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_networking"><a class="anchor" href="#_networking"></a>Networking</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>From a developer point of view, the pod networking in OpenShift uses largely the
+same concepts as ICP and Kubernetes in general. There are some implementation
+differences in OpenShift networking to watch out for if you are managing the
+platform.</p>
+</div>
+<div class="sect2">
+<h3 id="_openshift_sdn"><a class="anchor" href="#_openshift_sdn"></a>OpenShift SDN</h3>
+<div class="paragraph">
+<p>The default networking implementation in OpenShift is the OpenShift SDN.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/architecture/networking/sdn.html">https://docs.OpenShift.com/container-platform/3.11/architecture/networking/sdn.html</a></p>
+</div>
+<div class="paragraph">
+<p>OpenShift SDN has with three different plugins that provide different levels of
+network isolation between projects:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>ovs-subnet</strong>: (default) flat network that allows all projects to talk to all
+projects</p>
+</li>
+<li>
+<p><strong>ovs-multitenant</strong>: all projects are isolated from each other, with a single
+exception the <code>default</code> project where the OpenShift router and internal image
+registry run</p>
+</li>
+<li>
+<p><strong>ovs-networkpolicy</strong>: allows fine-grained control of network isolation using
+NetworkPolicy objects (equivalent to ICP).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When installing OpenShift, Red Hat recommends always installing using the
+<strong>ovs-networkpolicy</strong> plugin which provides near parity with ICP feature with
+Calico. To use this, add the following parameter to the ansible hosts file
+before installation:</p>
+</div>
+<div class="paragraph">
+<p><code>os_sdn_network_plugin_name='redhat/OpenShift-ovs-multitenant'</code></p>
+</div>
+<div class="paragraph">
+<p>Note that it’s possible to run Calico on OpenShift instead of Openshfit SDN;
+however Red Hat does not support this directly and the client will need to
+purchase support directly from Tigera. The list of additional vendor-supported
+network plugins are available here:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/install_config/configuring_sdn.html#admin-guide-configuring-sdn-available-sdn-providers">https://docs.OpenShift.com/container-platform/3.11/install_config/configuring_sdn.html#admin-guide-configuring-sdn-available-sdn-providers</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_openshift_sdn_architecture"><a class="anchor" href="#_openshift_sdn_architecture"></a>OpenShift SDN Architecture</h3>
+<div class="paragraph">
+<p>OpenShift SDN networking components live in the <code>openshift-sdn</code> project in
+OpenShift, and consist of two daemonsets, <code>ovs</code> and <code>sdn</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>ovs</code> is a containerized version of Open vSwitch which is an open source SDN
+software used most commonly in OpenStack. This will manage a bridge device,
+vxlan tunnel device for the pod network, and all of the virtual ethernet devices
+(veths) for each pod as they are created and destroyed.</p>
+</div>
+<div class="paragraph">
+<p><code>sdn</code> is a component used to program openvswitch by synchronizing routes to
+the other worker nodes and any cluster IP services created in the cluster. The
+routes are programmed as open vswitch flows and the cluster IPs are configured
+using netfilter (iptables) rules.</p>
+</div>
+<div class="paragraph">
+<p>To dump the flows for debugging or informational purposes, you may install the
+<code>`openvswitch'' package on any cluster node, and use `ovs-ofctl</code> to view the
+flow table. See
+<a href="https://docs.openshift.com/enterprise/3.1/admin_guide/sdn_troubleshooting.html#debugging-local-networking">https://docs.OpenShift.com/enterprise/3.1/admin_guide/sdn_troubleshooting.html#debugging-local-networking</a>
+for more information. This output is helpful to understand how pod traffic is
+forwarded.</p>
+</div>
+<div class="paragraph">
+<p>In contrast to ICP/Calico, which uses a single controller pod running on the
+master nodes to orchestrate subnet selection, routes and network policy rules,
+and a daemonset <code>`calico-node'' running across each cluster node to program
+iptables rules and do route propagation. In ICP/Calico, the `kube-proxy</code>
+container running on every node programs the cluster IPs in iptables rules
+instead of the <code>calico-node</code> pod.</p>
+</div>
+<div class="paragraph">
+<p>In both ICP and Calico cases, the daemonset runs as a privileged container on
+each host in order to have access to the host network.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ip_address_management"><a class="anchor" href="#_ip_address_management"></a>IP Address Management</h3>
+<div class="paragraph">
+<p>As in standard Kubernetes, both OpenShift and ICP have a pod overlay network
+where address space is defined for pods, and pod IP addresses are drawn from
+subnets selected from this address space. In ICP this was defined using the
+<code>`network_cidr'' property in the installation config.yaml. OpenShift also has
+the same concept, where the cluster network CIDR defined in
+`osm_cluster_network_cidr</code> in the ansible hosts file, the default is
+<code>10.128.0.0/14</code>. You can view the subnet in the <code>clusternetwork</code> custom
+resource in OpenShift (<code>oc get clusternetwork</code>).</p>
+</div>
+<div class="paragraph">
+<p>Every node in the cluster will receive a <code>slice'' of this address space. One
+additional parameter in OpenShift is the <code>osm_host_subnet_length</code>, which
+defines the size of the subnets assigned to each node in the cluster where pods
+running on them will be assigned IP addresses from. In ICP, Calico automatically
+selected this size based on the number of nodes in the cluster and the size of
+the pod network, and was able to resize and </code>steal'' subnets from other nodes
+when particular worker nodes exhausted their pool. In OpenShift this is a static
+length. The default value of this is 9, which indicates that every worker node
+will get 32-9=23 bits of subnet space (i.e. a /23 subnet, or 512 IP addresses).
+The assigned host subnets are stored in the <code>hostsubnets</code> Kubernetes custom
+resource (<code>oc get hostsubnets</code>). It’s important to select a subnet length that
+will satisfy both the number of worker nodes and the expected number of pods on
+each worker node in the cluster.</p>
+</div>
+<div class="paragraph">
+<p>Like in ICP, there is an additional <code>`service network'' overlay network, which
+is a non-overlapping address space with the pod network that ClusterIP services
+are defined on. In OpenShift the installation parameter for this is
+`openshift_portal_net</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pod_routing_and_route_propagation"><a class="anchor" href="#_pod_routing_and_route_propagation"></a>Pod Routing and Route Propagation</h3>
+<div class="paragraph">
+<p>In ICP, Calico propagated routes using a node-to-node mesh where every worker
+node became a ``router'' for its assigned subnet on the pod network and the
+routes were communicated using border gateway protocol (BGP). Since BGP is a
+standard protocol used on the internet, it was possible for non-cluster nodes to
+join the peer-to-peer mesh and the routes to be propagated outside of the
+cluster and potentially gain some visibility into the pod network with external
+tools. However, because of the node-to-node mesh there can be scalability issues
+when the cluster becomes very large, BGP route reflectors could be used to
+propagate routes instead.</p>
+</div>
+<div class="paragraph">
+<p>In OpenShift, the routes are stored in Kubernetes resources and the ``sdn''
+DaemonSet programs the routes on each cluster node as flows in the local
+openvswitch tables. There is a bridge interface on each node that all pods
+receive a port on, and a tunnel interface where all outbound pod network traffic
+is sent when the destination pod is not running on the local node.</p>
+</div>
+<div class="paragraph">
+<p>The following documentation helps to understand the network flows:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/architecture/networking/sdn.html#sdn-packet-flow">https://docs.OpenShift.com/container-platform/3.11/architecture/networking/sdn.html#sdn-packet-flow</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_network_isolation"><a class="anchor" href="#_network_isolation"></a>Network Isolation</h3>
+<div class="paragraph">
+<p>In contrast to ICP and Calico’s usage of iptables rules, OpenShift SDN uses
+VXLAN to perform project-level isolation. Every project is assigned a Virtual
+Network Identifier (VNID), and as traffic leaves the Open vSwitch tunnel, the
+VNID is added to the outgoing packet. When traffic reaches the destination, if
+the worker node does not have a policy (either the same VNID, or an explicit
+Open vSwitch flow from a Network Policy) that allows the traffic, it is dropped.
+As mentioned earlier the <code>default'' namespace runs the router and registry and
+as such, every project is allowed to access this project, which is given the
+special VNID 0. It’s important for administrators not to expose </code>default'' to
+users to deploy pods in general as all projects in the cluster will have network
+access to it.</p>
+</div>
+<div class="paragraph">
+<p>You can read more details here:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/architecture/networking/sdn.html#network-isolation-multitenant">https://docs.OpenShift.com/container-platform/3.11/architecture/networking/sdn.html#network-isolation-multitenant</a></p>
+</div>
+<div class="paragraph">
+<p>In some environments, OpenShift may run on top of infrastructure that already
+uses VXLAN for isolation (such as VMware and NSX) and the VXLAN port used must
+be changed due to conflicts. This can be done by following the steps documented
+here:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/install_config/configuring_sdn.html#config-changing-vxlan-port-for-cluster-network">https://docs.OpenShift.com/container-platform/3.11/install_config/configuring_sdn.html#config-changing-vxlan-port-for-cluster-network</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_networkpolicy"><a class="anchor" href="#_networkpolicy"></a>NetworkPolicy</h3>
+<div class="paragraph">
+<p>NetworkPolicy is largely the same in OpenShift as it is in ICP. There is one
+difference in that OpenShift only supports ingress NetworkPolicy, so network
+policies with egress rules do not work and egress network policy is controlled
+using a separate EgressNetworkPolicy object.</p>
+</div>
+<div class="paragraph">
+<p>NetworkPolicy objects in OpenShift result in flow rules in Open vSwitch, and if
+using a podSelector to match pods, the more pods that match the rule, the more
+rules are created, which may cause some scalability issues. See documentation
+for an explanation:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/admin_guide/managing_networking.html#admin-guide-networking-using-networkpolicy-efficiently">https://docs.OpenShift.com/container-platform/3.11/admin_guide/managing_networking.html#admin-guide-networking-using-networkpolicy-efficiently</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_egressnetworkpolicy_and_egressrouter"><a class="anchor" href="#_egressnetworkpolicy_and_egressrouter"></a>EgressNetworkPolicy and EgressRouter</h3>
+<div class="paragraph">
+<p>As mentioned in previous section, the OpenShift EgressNetworkPolicy is a
+separate object used to control egress traffic from pods to external subnets.
+These are implemented at Layer 3 in openflow table rules. The destinations may
+also be DNS names, but these are implemented using a DNS lookup of the name and
+the subsequent rules on the resolved IP address for the DNS record’s TTL. You
+can see more information in the documentation here:
+<a href="https://docs.openshift.com/container-platform/3.11/admin_guide/managing_networking.html#admin-guide-limit-pod-access-egress">https://docs.OpenShift.com/container-platform/3.11/admin_guide/managing_networking.html#admin-guide-limit-pod-access-egress</a></p>
+</div>
+<div class="paragraph">
+<p>OpenShift has an object that allows all egress to a particular external service
+go through a single node, called EgressRouter. This allows traffic coming from
+the cluster to an external service appear from a static IP and allows operations
+to whitelist that router. See:
+<a href="https://docs.openshift.com/container-platform/3.11/admin_guide/managing_networking.html#admin-guide-limit-pod-access-egress-router">https://docs.OpenShift.com/container-platform/3.11/admin_guide/managing_networking.html#admin-guide-limit-pod-access-egress-router</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dns"><a class="anchor" href="#_dns"></a>DNS</h3>
+<div class="paragraph">
+<p>ICP runs a DaemonSet across the masters containing CoreDNS for cluster DNS
+lookup and name resolution. DNS was only available inside of pods, as the
+kubelet would set each pod’s /etc/resolv.conf to point at the service IP address
+of the CoreDNS pod, and the host’s /etc/resolv.conf is used for upstream name
+resolution.</p>
+</div>
+<div class="paragraph">
+<p>OpenShift 3.11 implements DNS slightly differently: SkyDNS runs on every node
+and is embedded within the atomic-OpenShift-node service listening on port 53.
+This node will sync service names and endpoints retrieved from etcd to the local
+SkyDNS. Every node in the cluster will have its /etc/resolv.conf rewritten to
+point at the local copy of SkyDNS. All pods will also have their
+/etc/resolv.conf rewritten to point at the IP address of the local host. This
+means that service names (using FQDN of the cluster internal domain) are
+resolvable even from cluster nodes.</p>
+</div>
+<div class="paragraph">
+<p>OpenShift will not start if NetworkManager is not enabled on all nodes. Make
+sure that NetworkManager is managing all interfaces (NM_CONTROLLED=yes in
+/etc/sysconfig/network-scripts/ifcfg-eth*). A script that runs when
+NetworkManager brings up the interface will rewrite the local /etc/resolv.conf
+to point at SkyDNS; the upstream DNS servers are stored in
+/etc/origin/node/resolv.conf.</p>
+</div>
+<div class="paragraph">
+<p>See the documentation for more information:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/architecture/networking/networking.html#architecture-additional-concepts-openshift-dns">https://docs.OpenShift.com/container-platform/3.11/architecture/networking/networking.html#architecture-additional-concepts-OpenShift-dns</a></p>
+</div>
+<div class="paragraph">
+<p>Note that OpenShift 4.x implements this differently and has moved to the more
+familiar CoreDNS.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_routes_vs_ingress"><a class="anchor" href="#_routes_vs_ingress"></a>Routes vs Ingress</h3>
+<div class="paragraph">
+<p>In order to get external cluster traffic into the cluster, ICP used the Proxy
+Nodes which run an nginx-based ingress controller. Ingress resources stored in
+Kubernetes were used to program the nginx configuration to accept Layer-7
+traffic based on specific rules, and could leverage certain nginx features like
+path-based rewrites and TLS termination using annotations on the ingress
+resource.</p>
+</div>
+<div class="paragraph">
+<p>In OpenShift, there is a similar component running on the <code>infra'' nodes called
+the Router. This is an HAProxy container, and runs in the special </code>default''
+project that all projects should have access to. OpenShift uses a special
+<code>Route'' object that pre-dates </code>Ingress'' resources in Kubernetes, which can
+be used to expose Layer 7 traffic, terminate TLS. There are a few more options
+that are exposed as first-class properties of Routes such as being able to
+passthrough TLS connections or re-encrypt them.</p>
+</div>
+<div class="paragraph">
+<p>In later versions of OpenShift (3.10+), the router is able to translate
+<code>Ingress'' objects to </code>Routes''. However, HAProxy is not as feature-rich as
+nginx and as such some features in the ICP ingress controller are not available
+using OpenShift routes, most notably path-based rewrites. A workaround is to run
+a standalone nginx controller that can perform these rewrites as needed in each
+project, and expose that using through the OpenShift router.</p>
+</div>
+<div class="paragraph">
+<p>When OpenShift is installed, it requires a wildcard domain pointing at the IP
+address or load balancer in front of the nodes where the router is installed
+(<strong>OpenShift_hosted_registry_routehost</strong>). All routes will by default be given a
+DNS name like &lt;route-name&gt;-&lt;project-name&gt;.&lt;app-subdomain&gt;.</p>
+</div>
+<div class="paragraph">
+<p>More documentation about the default HAProxy router, including some advanced use
+cases like router sharding (which is similar to the ICP isolated proxy use case)
+is here:
+<a href="https://docs.openshift.com/container-platform/3.11/install_config/router/default_haproxy_router.html#install-config-router-default-haproxy">https://docs.OpenShift.com/container-platform/3.11/install_config/router/default_haproxy_router.html#install-config-router-default-haproxy</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_external_integration_with_f5_load_balancer"><a class="anchor" href="#_external_integration_with_f5_load_balancer"></a>External Integration with F5 Load Balancer</h3>
+<div class="paragraph">
+<p>Note that like ICP, there is an F5 BIGIP controller for OpenShift where a
+controller is able to program an F5 appliance through the API in response to
+Kubernetes resources. See:
+<a href="https://clouddocs.f5.com/containers/v2/openshift/">https://clouddocs.f5.com/containers/v2/OpenShift/</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_operation_cluster_management_monitoring_and_logging"><a class="anchor" href="#_operation_cluster_management_monitoring_and_logging"></a>Operation – Cluster Management, Monitoring and Logging</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Operation maybe one of the complex areas requires extra planning and effort to
+migrate from ICP to OpenShift.</p>
+</div>
+<div class="sect2">
+<h3 id="_cluster_management"><a class="anchor" href="#_cluster_management"></a>Cluster Management</h3>
+<div class="paragraph">
+<p>We mentioned the different options to access ICP and OpenShift in early
+chapters. From operation perspective either manual or automated, the command
+line tools (cli) might be the most relevant tool. The good news is that both
+platform support <code>kubectl'' to operate your cluster. The not so good news is
+that both have their own flavor of cli (ICP has the cloudctl while OpenShift has
+oc). Most of the standard kubernetes tasks can be carried out by sticking to
+</code>kubectl''. That puts migration as small effort to migrate any <code>cloudctl''
+command to either </code>kubectl'' or ``oc'' or sunset them.</p>
+</div>
+<div class="paragraph">
+<p>One area you need to pay attention is that OpenShift runs only on RHEL or RHCOS
+operating system. That may introduce some migration work when your ICP is
+running on non-RedHat OS. For example, if you have operation scripts handles the
+patches update on OS, service restart etc.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_monitoring"><a class="anchor" href="#_monitoring"></a>Monitoring</h3>
+<div class="paragraph">
+<p>Both platforms are adopting the CNCF projects as de-facto standard when comes to
+monitoring. They are Grafana and Prometheus. ICP has fairly decent integration
+with both technologies and OpenShift 3.11 installs them by default. But this
+doesn’t mean the migration is that straightforward.</p>
+</div>
+<div class="paragraph">
+<p>First, Prometheus may collect different set of metrics. It will be at least a
+medium level of effort to adjust the Prometheus Query Language and tested in new
+OpenShift platform.</p>
+</div>
+<div class="paragraph">
+<p>Then, you might need to migrate the Grafana dashboards that purposely built for
+ICP. OpenShift comes with some sample dashboard like Docker or Kubernetes
+monitoring via Prometheus.</p>
+</div>
+<div class="paragraph">
+<p>Alerting is another area you need to consider. In theory, OpenShift Prometheus
+supports AlertManager (can be installed as optional component). But ensuring the
+existing ICP alerts fully function in OpenShift including Notification by email,
+webhooks, Slack, PagerDuty and alert Silencing, aggregation, inhibiting can take
+quite bit of effort.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_logging"><a class="anchor" href="#_logging"></a>Logging</h3>
+<div class="paragraph">
+<p>ICP deploys an ELK (ElasticSearch, Logstash, Kibana) stack, referred to as the
+management logging service, to collect and store all Docker-captured logs.</p>
+</div>
+<div class="paragraph">
+<p>OpenShift uses the EFK (ElasticSearch, fluentd, Kibana) stack as a logging
+solution. The main difference comparing to ICP is how the logs are shipped out
+of the cluster with Fluentd. But most of that is implementation detail and
+relatively transparent to the application and end user.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_migration_strategy_icp_cluster_migration"><a class="anchor" href="#_migration_strategy_icp_cluster_migration"></a>Migration Strategy – ICP Cluster migration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="./migration_strategy.md">Migration Strategy</a></p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

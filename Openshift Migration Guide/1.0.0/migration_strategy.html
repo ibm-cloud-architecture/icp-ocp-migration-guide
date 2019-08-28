@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <meta name="generator" content="Antora 1.1.1">
+    <link rel="stylesheet" href="../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="migration_strategy.html">Migration Strategy</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/ldap_migration.html">User Authentication Migration – LDAP</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/rbac_migration.html">User Authorization Migration - RBAC</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/storage.html">Storage migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/app_resource_migration.html">App resource migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="migration/jenkins_migration.html">Jenkins server migration</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="key_differences.html">Key Differences</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main role="main">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Openshift Migration Guide</a></li>
+    <li><a href="migration_strategy.html">Migration Strategy</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///antora/modules/ROOT/pages/migration_strategy.adoc">Edit this Page</a></div>
+</div>
+<article class="doc">
+<div class="sect1">
+<h2 id="_migration_strategy_icp_cluster_migration"><a class="anchor" href="#_migration_strategy_icp_cluster_migration"></a>Migration Strategy – ICP Cluster migration</h2>
+<div class="sectionbody">
+<!-- toc disabled -->
+<div class="sect2">
+<h3 id="_openshift_installation"><a class="anchor" href="#_openshift_installation"></a>OpenShift Installation</h3>
+<div class="paragraph">
+<p>To migrate from ICP to Openshift, the recommended approach is a blue-green
+deployment where an Openshift cluster is created alongside an existing ICP
+cluster, the workload is migrated from ICP to Openshift, load balancers or DNS
+entries are updated to point clients at the new cluster, and the ICP cluster is
+retired.</p>
+</div>
+<div class="paragraph">
+<p>We highly recommend infrastructure automation to create new clusters for
+Openshift. This provides the quickest path for new cluster creation. We have
+published infrastructure automation templates for ICP on various cloud
+platforms, for example:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/ibm-cloud-architecture/terraform-icp-vmware" class="bare">https://github.com/ibm-cloud-architecture/terraform-icp-vmware</a></p>
+</div>
+<div class="paragraph">
+<p>Terraform Examples for OpenShift will be published soon.</p>
+</div>
+<div class="paragraph">
+<p>In scenarios where resources are limited, the approach involves draining and
+removing under-utilized ICP worker nodes and using the capacity to build a small
+Openshift control plane with a few workers. Depending on available capacity, an
+Openshift cluster can start as a single master and scale up to three masters as
+capacity is made available.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_user_migration"><a class="anchor" href="#_user_migration"></a>User Migration</h3>
+<div class="sect3">
+<h4 id="_user_authentication_migration_ldap"><a class="anchor" href="#_user_authentication_migration_ldap"></a>User Authentication migration – LDAP</h4>
+<div class="paragraph">
+<p>Kubernetes does not have users; it’s up to the Kubernetes distribution to
+provide an authentication endpoint that performs user authentication and
+identity mapping to either a User or a Group. Kubernetes does have roles and
+cluster roles, which are used to group permissions, and rolebindings and
+clusterrolebindings, which are used to assign permissions to particular users or
+groups.</p>
+</div>
+<div class="paragraph">
+<p>For more information about how authentication is implemented in Kubernetes, see:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://kubernetes.io/docs/reference/access-authn-authz/authentication/" class="bare">https://kubernetes.io/docs/reference/access-authn-authz/authentication/</a></p>
+</div>
+<div class="paragraph">
+<p>In ICP, the internal auth-idp component is used as an OIDC provider that
+authenticates users. This component can be configured from the UI and will
+connect to LDAP on behalf of the cluster to authenticate users. The <code>Teams</code>
+concept is used to group together users or groups from LDAP into logical groups
+and is managed by the auth-idp component and persisted in mongodb.</p>
+</div>
+<div class="paragraph">
+<p>Openshift 3.11 has a similar component embedded in the API server that performs
+authentication on behalf of the cluster. However, it does not have a UI to
+configure LDAP, so it takes some work during installation or after installation
+to configure LDAP.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider" class="bare">https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider</a></p>
+</div>
+<div class="paragraph">
+<p>Openshift 4.x uses a separate operator to perform authentication, and another
+operator manages that operator and its configuration using a
+CustomResourceDefinition to configure LDAP and other identity providers.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-ldap-identity-provider.html" class="bare">https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-ldap-identity-provider.html</a></p>
+</div>
+<div class="paragraph">
+<p>In our migration scenario, we specifically we looked at migrating an existing
+ICP LDAP connection to Openshift 3.11.</p>
+</div>
+<div class="paragraph">
+<p>Our LDAP server had the following contents:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>dn: dc=internal-network,dc=local
+dc: internal-network
+objectClass: top
+objectClass: domain
+
+dn: cn=ldapadm,dc=internal-network,dc=local
+objectClass: organizationalRole
+cn: ldapadm
+
+dn: ou=People,dc=internal-network,dc=local
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Group,dc=internal-network,dc=local
+objectClass: organizationalUnit
+ou: Group
+
+dn: cn=binduser,dc=internal-network,dc=local
+cn: binduser
+objectClass: organizationalRole
+objectClass: top
+objectClass: simpleSecurityObject
+
+dn: cn=user1,ou=People,dc=internal-network,dc=local
+cn: user1
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: one
+uid: user1
+
+dn: cn=dev1,ou=Group,dc=internal-network,dc=local
+cn: dev1
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=user1,ou=People,dc=internal-network,dc=local
+uniqueMember: cn=user2,ou=People,dc=internal-network,dc=local
+
+dn: cn=user2,ou=People,dc=internal-network,dc=local
+cn: user2
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: user two
+uid: user2
+
+dn: cn=clusteradmin,ou=People,dc=internal-network,dc=local
+cn: clusteradmin
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: cluster admin
+uid: clusteradmin
+
+dn: cn=admin,ou=Group,dc=internal-network,dc=local
+cn: admin
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=clusteradmin,ou=People,dc=internal-network,dc=local
+
+dn: cn=dev2,ou=Group,dc=internal-network,dc=local
+cn: dev2
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=user3,ou=People,dc=internal-network,dc=local
+uniqueMember: cn=user4,ou=People,dc=internal-network,dc=local
+
+dn: cn=user3,ou=People,dc=internal-network,dc=local
+cn: user3
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: three
+uid: user3
+
+dn: cn=user4,ou=People,dc=internal-network,dc=local
+cn: user4
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: four
+uid: user4</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The ICP configuration appeared as follows:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/image1.png" alt="LDAP settings in ICP">
+</div>
+</div>
+<div class="paragraph">
+<p>The matching Openshift configuration was configured under identityProviders on
+each master host in /etc/origin/master/master-config.yaml. Once this was
+configured we restarted docker on each master host to restart the API server.
+The configuration is as follows:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>identityProviders:
+  - name: "rhos-ldap"
+    challenge: true
+    login: true
+    mappingMethod: claim
+    provider:
+      apiVersion: v1
+      kind: LDAPPasswordIdentityProvider
+      attributes:
+        id:
+        - dn
+        email:
+        - mail
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: "cn=binduser,dc=internal-network,dc=local"
+      bindPassword: "Letmein"
+      insecure: true
+      url: "ldap://192.168.100.4:389/dc=internal-network,dc=local?uid?sub?(objectclass=person)"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pay particular interest to the url. The format of the URL is</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>ldap://host:port/basedn?attribute?scope?filter</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We have translated this from the ICP configuration, where <code>attribute</code> and
+<code>filter</code> are built from the <code>User filter</code> in the ICP configuration. The
+query it uses is:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>(&amp;(attribute=%v)(filter))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Openshift has explicit <code>user</code> and <code>group</code> resources which the API server
+manages. You can list them using the familiar <code>oc get users</code> and <code>oc get
+groups</code> commands as well as create additional ones.</p>
+</div>
+<div class="paragraph">
+<p>As Openshift is a developer platform, the default mappingMethod <code>claim</code> allows
+anybody that successfully authenticates access to the platform to login and
+create projects. When authentication is successful, the platform will create a
+<code>user</code> resource automatically. The ICP model denies access to any users in
+LDAP that are not part of a team. To match the ICP model and deny access to
+anybody not explicitly added to Openshift there are two options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>use the mappingMethod <code>lookup</code>. However this requires additional overhead as
+the administrator must individually create users in the Openshift platform
+before they are given access to log in to Openshift.</p>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LookupMappingMethod" class="bare">https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LookupMappingMethod</a></p>
+</div>
+<div class="paragraph">
+<p>In our case, we created a user for user1, created an identity for it in ldap,
+and then mapped them together:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc create user user1
+user.user.openshift.io/user1 created
+
+$ oc create identity rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local
+identity.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local created
+
+$ oc create useridentitymapping rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local user1
+useridentitymapping.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local created</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Leave the default mappingMethod <code>claim</code> but deny access to create new
+projects in Openshift. By default the <code>system:authenticated</code> group
+(i.e. anybody in LDAP) is given the <code>self-provisioner</code> cluster-role, which
+allows project creation. Removing the role removes the overhead of having to
+create new users as they log in, but also prevents authenticated users from
+consuming resources in the platform without cluster administrator action. See:
+<a href="https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#disabling-self-provisioning" class="bare">https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#disabling-self-provisioning</a></p>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kubernetes.io/autoupdate": "false" } } }'
+$ oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'</pre>
+</div>
+</div>
+</li>
+<li>
+<p>We think this matches ICP the closest, but allowing users to create projects
+on their own has some advantages in developer scenarios. Using the above policy
+makes sense in production clusters but can be relaxed in development/test
+clusters.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_group_migration_ldap"><a class="anchor" href="#_group_migration_ldap"></a>Group migration – LDAP</h4>
+<div class="paragraph">
+<p>Note that the Openshift api server does not query groups from LDAP; group
+definitions must be synced manually. The documentation around this is here:
+<a href="https://docs.openshift.com/container-platform/3.11/install_config/syncing_groups_with_ldap.html" class="bare">https://docs.openshift.com/container-platform/3.11/install_config/syncing_groups_with_ldap.html</a></p>
+</div>
+<div class="paragraph">
+<p>In our scenario we had users in the tree under ou=People, and groups under
+ou=Group. Three groups were created (dev1, dev2, and admins). We used the
+following rfc2307 LDAP sync config:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://192.168.100.4:389/dc=internal-network,dc=local
+bindDN: "cn=binduser,dc=internal-network,dc=local"
+bindPassword: "Letmein"
+insecure: true
+rfc2307:
+    groupsQuery:
+        baseDN: "ou=Group,dc=internal-network,dc=local"
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+        filter: "(objectclass=groupOfUniqueNames)"
+    groupUIDAttribute: dn
+    groupNameAttributes: [ cn ]
+    groupMembershipAttributes: [ uniqueMember ]
+    usersQuery:
+        baseDN: "ou=People,dc=internal-network,dc=local"
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+    userUIDAttribute: dn
+    userNameAttributes: [ uid ]
+    tolerateMemberNotFoundErrors: false
+    tolerateMemberOutOfScopeErrors: false</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe how this maps to the configuration in ICP; the groups are of object
+class <code>groupOfUniqueNames</code> and the <code>uniqueMember</code> attribute contains the
+members of the group which will be in turn queried.</p>
+</div>
+<div class="paragraph">
+<p>Running this command will add some Openshift <code>Group</code> resources that can be
+assigned roles.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc adm groups sync --sync-config=rfc2307_config.yaml  --confirm
+group/dev1
+group/admin
+group/dev2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The result is three groups, with the user mappings as shown.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc get groups
+NAME      USERS
+admin     clusteradmin
+dev1      user1, user2
+dev2      user3, user4</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As this is a manual process that produces static user/group mappings, it may be
+required to run this on a schedule that updates and prunes groups in an ongoing
+basis.</p>
+</div>
+<div class="paragraph">
+<p>One additional implementation note is that Openshift issues Opaque tokens; since
+the authentication module is embedded in the API server it is able to validate
+the tokens internally. In ICP, the authentication token issued by the auth
+service is a signed JWT that contains an embedded list of groups that Kubernetes
+uses to validate permissions. In the next session when we discuss RBAC, we can
+see how rolebindings and clusterrolebindings are bound to these groups.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_user_authorization_migration_rbac"><a class="anchor" href="#_user_authorization_migration_rbac"></a>User Authorization Migration (RBAC)</h4>
+<div class="paragraph">
+<p>Kubernetes ships with some out of box user-facing cluster roles:
+<a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles" class="bare">https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles</a></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>cluster-admin</code></p>
+</li>
+<li>
+<p><code>admin</code></p>
+</li>
+<li>
+<p><code>edit</code></p>
+</li>
+<li>
+<p><code>view</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ICP ships with five additional user-facing cluster roles which correspond to the
+roles used in teams:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>icp:admin</code></p>
+</li>
+<li>
+<p><code>icp:edit</code></p>
+</li>
+<li>
+<p><code>icp:operate</code></p>
+</li>
+<li>
+<p><code>icp:teamadmin</code></p>
+</li>
+<li>
+<p><code>icp:view</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These are implemented as aggregated roles, which means there are several roles
+where their permissions are union-ed together to provide a full set of
+permissions for the user. The permissions are contained in aggregate roles. Note
+that the admin role contains all of the permissions that the edit role contains,
+etc.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>icp-admin-aggregate</code></p>
+</li>
+<li>
+<p><code>icp-edit-aggregate</code></p>
+</li>
+<li>
+<p><code>icp-operate-aggregate</code></p>
+</li>
+<li>
+<p><code>icp-view-aggregate</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Openshift ships with four user-facing cluster roles:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>admin</code></p>
+</li>
+<li>
+<p><code>basic-user</code></p>
+</li>
+<li>
+<p><code>edit</code></p>
+</li>
+<li>
+<p><code>view</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Since RBAC is common in both Openshift and ICP, it’s tempting to just export
+these 9 roles to Openshift. However, some Openshift-specific resources are added
+to the Kubernetes out-of-box roles. These are in the <code>*.openshift.io</code>
+apiGroups defined in the roles for the above.</p>
+</div>
+<div class="paragraph">
+<p>As clusterroles are whitelists of permissions, and access in Kubernetes is a
+union of all of the roles bound to the identity, one potential way of quickly
+migrating permissions is to import the cluster roles from ICP, assign the ICP
+roles to the users and groups, then assign the Openshift <code>view</code> role to all
+users so that the projects will appear in the CLI and UI. The Openshift <code>view</code>
+role will overlap with the <code>icp:view</code> role but the Openshift <code>view</code> role
+will enable view of the Openshift specific resources (e.g. projects, builds,
+etc). This will allow the same access to the Kubernetes API that was assigned in
+ICP. Additional access to Openshift specific objects (e.g. to create a build,
+deployment configs, etc) may be added by assigning Openshift specific roles like
+<code>edit</code>, <code>admin</code>, etc.</p>
+</div>
+<div class="paragraph">
+<p>Here is one team that we created with the following group/user mappings:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cloudctl iam team-get dev-1
+Name: dev1
+ID: dev-1
+
+ID      Type    Name    Email   Roles
+dev1    group   -       -       Viewer
+user1   user    user1   -       Administrator</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the following resources assigned:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cloudctl iam resources -t dev-1
+CRN
+crn:v1:icp:private:k8:jkwong-icp-31-cluster:n/dev1:::</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We exported the 9 ICP roles from ICP as yamls, and imported them into openshift.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ kubectl get clusterroles | grep icp | awk '{print $1}' | xargs -n1 -I{} kubectl get clusterrole {} -o yaml  | tee  all-roles.yaml
+
+...
+
+$ oc apply -f all-roles.yaml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we created the associated resources (i.e. the namespace/project) and mapped
+the same permissions using the following commands:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc new-project dev1
+Now using project "dev1" on server "https://console.jkwong-ocp.internal-network.local:443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app centos/ruby-25-centos7~https://github.com/sclorg/ruby-ex.git
+
+to build a new example application in Ruby.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We initially gave access to both of these entities:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc adm policy add-role-to-group view dev1
+role "view" added: "dev1"
+$ oc adm policy add-role-to-user view user1
+role "view" added: "user1"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next we assigned the ICP role to give the same access that the user had in ICP.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc adm policy add-role-to-group icp:view dev1
+role "icp:view" added: "dev1"
+$ oc adm policy add-role-to-user icp:admin user1
+role "icp:admin" added: "user1"</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_workload_migration"><a class="anchor" href="#_workload_migration"></a>Workload Migration</h3>
+<div class="paragraph">
+<p>In this section we used a case study of migrating our cloud native reference
+application BlueCompute that was running on ICP to Openshift.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes" class="bare">https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes</a></p>
+</div>
+<div class="sect3">
+<h4 id="_modify_containers_to_run_as_non_root_and_other_mitigations"><a class="anchor" href="#_modify_containers_to_run_as_non_root_and_other_mitigations"></a>Modify containers to run as non-root and other mitigations</h4>
+<div class="paragraph">
+<p>Following some guidelines here:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html" class="bare">https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html</a></p>
+</div>
+<div class="paragraph">
+<p>Openshift specific:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html#openshift-specific-guidelines" class="bare">https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html#openshift-specific-guidelines</a></p>
+</div>
+<div class="paragraph">
+<p>In general, when authoring containers, developers should try run with the least
+privileges as possible.</p>
+</div>
+<div class="sect4">
+<h5 id="_modifying_a_container_s_user"><a class="anchor" href="#_modifying_a_container_s_user"></a>Modifying a container’s USER</h5>
+<div class="paragraph">
+<p>If a container’s Dockerfile does not set a USER, then it runs as root by
+default.This is dangerous because root inside a container is also root on the
+host. Openshift prevents containers from running as <code>root</code> by applying a
+default <code>restricted</code> SecurityContextConstraint. When a container is started,
+Openshift will randomly select a uid from a range that does not have access to
+anything on the worker node in case a malicious container process is able to
+break out of its sandbox.</p>
+</div>
+<div class="paragraph">
+<p>In most application scenarios, the actual user a process runs as doesn’t matter,
+but there are some legitimate cases where the container expects to be run as a
+particular user, such as some database containers or other applications where it
+needs to read or write to its local filesystem or to a persistent volume. A
+simple mitigation is to add the <code>USER</code> directive to the Dockerfile before the <code>CMD</code>
+or <code>ENTRYPOINT</code> so that the main container process does not run as root, e.g.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>USER 1000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then making sure the files it modifies contains the correct permissions.</p>
+</div>
+<div class="paragraph">
+<p>It’s better to provide a numeric value rather than an existing user in
+/etc/passwd in the container’s filesystem, as Openshift will be able to validate
+the numeric value against any SCCs that restrict the uids that a container may
+run as. In the case where we use a third party container and we are not able to
+modify the Dockerfile, or the <code>USER</code> directive refers to a user that corresponds
+to something in /etc/passwd, we can add the securityContext section to the
+podspec to identify the UID that it the pod refers to. For example, in
+BlueCompute the MySQL container we used is from dockerhub, but they allow
+running as <code>USER</code> mysql which corresponds to uid <code>5984</code> in /etc/passwd, so we added
+this section to the podSpec in the deployment:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>securityContext:
+  runAsUser: 5984
+  runAsGroup: 5984
+  fsGroup: 1000</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The fsGroup is useful to provide supplemental groups which are added to the
+container’s processes. For example, in the above case the container process can
+also interact with files owned by group 1000, which might be helpful if using
+existing shared storage where there are directories owned by the group.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_modifying_a_container_s_filesystem_for_read_write"><a class="anchor" href="#_modifying_a_container_s_filesystem_for_read_write"></a>Modifying a container’s filesystem for read/write</h4>
+<div class="paragraph">
+<p>If filesystem access is needed in the container filesystem, then those files
+should be owned by and read/writable by the root group. In Openshift, the
+arbitrary uid used by the <code>restricted</code> SCC will be added to the <code>root</code> group.
+Directories that must be read to/written from as scratch space may add the
+following to the Dockerfile:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>RUN chgrp -R 0 /some/directory &amp;&amp; \
+    chmod -R g=u /some/directory</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another strategy that we’ve had success with is to create an <code>emptyDir</code> volume and
+mount it to the directory, which Kubernetes will create and destroy with the
+pod. The emptyDir volume is owned by root but is world writable and can be used
+as local storage for the container. This also helps someone reviewing the pod
+definition identify which directories will be written to.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>volumes:
+- emptyDir: {}
+  name: database-storage</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_a_code_nonroot_code_securitycontextconstraint"><a class="anchor" href="#_using_a_code_nonroot_code_securitycontextconstraint"></a>Using a <code>nonroot</code> SecurityContextConstraint</h4>
+<div class="paragraph">
+<p>In cases where existing shared storage is attached to the container as a volume,
+and the container must write to the filesystem as a particular uid, we can run
+the pod under a service account, and assign the "nonroot" scc to the service
+account. This relaxes the restrictions on the uid and allows the container
+process to be executed as some specific UID, but not root. This is essentially
+equivalent to ICP’s <code>ibm-restricted-psp</code> security policy. For example, in our
+above example our MySQL container runs as uid 5984, but Openshift blocks the
+execution since the uid is not within the allowed range for<code>restricted</code> SCC, so
+we created a service account <code>inventory-mysql</code> for the pod, allow it to use
+the <code>nonroot</code> SCC and set the deployment to run as this service account.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc create serviceaccount inventory-mysql
+$ oc adm policy add-scc-to-user nonroot -z inventory-mysql
+$ oc patch deploy/inventory-mysql --patch \
+     '{"spec":{"template":{"spec":{"serviceAccountName":"inventory-myql"}}}}}'</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_code_anyuid_code_seucirtycontextconstraint"><a class="anchor" href="#_using_code_anyuid_code_seucirtycontextconstraint"></a>Using <code>anyuid</code> SeucirtyContextConstraint</h4>
+<div class="paragraph">
+<p>In cases where running as the root user is absolutely necessary, we can leverage
+a serviceaccount and assign the <code>anyuid</code> SCC to allow the container to run as
+root. For example, in our BlueCompute reference application, couchdb only works
+when it runs as root due to the way it tries to change ownership of the data
+directories. We will allow couchdb to run as root user:</p>
+</div>
+<div class="paragraph">
+<p>Steps in ICP:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ kubectl ceate serviceaccount -n bluecompute customer-couchdb
+$ kubectl create role psp-ibm-anyuid-psp -n bluecompute --verb=use \
+     --resource=podsecuritypolicy --resource-name=ibm-anyuid-psp
+$ kubectl create rolebinding couchdb-ibm-anyuid-psp -n bluecompute \
+     --role=psp-ibm-anyuid-psp --serviceaccount=bluecompute:customer-couchdb</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we add the serviceaccount to the podspec in the statefulset.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ kubectl patch deploy/couchdb --patch \
+     '{"spec":{"template":{"spec":{"serviceAccountName":"customer-couchdb"}}}}}'</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Similarly, in Openshift:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc create serviceaccount -n bluecompute customer-couchdb
+$ oc adm policy add-scc-to-user anyuid -z customer-couchdb
+$ oc patch deploy/couchdb --patch \
+     '{"spec":{"template":{"spec":{"serviceAccountName":"customer-couchdb"}}}}}'</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_devops_and_developer_toolchains"><a class="anchor" href="#_devops_and_developer_toolchains"></a>DevOps and Developer toolchains</h3>
+<div class="paragraph">
+<p>Generally, ICP was not opinionated on DevOps, and if the toolchain is outside of
+the platform there is no reason for this to change when migrating to Openshift.</p>
+</div>
+<div class="paragraph">
+<p>Openshift’s value proposition does include some developer productivity tools
+such as Source-to-Image (S2I) and containerized Jenkins, as well as tech preview
+and support for Openshift Pipelines and CodeReady Workspaces, but in a migration
+scenario where we are migrating existing workload from ICP these are not
+required to change. We can simply treat Openshift as another Kubernetes platform
+we are deploying to.</p>
+</div>
+<div class="sect3">
+<h4 id="_jenkins_server_migration"><a class="anchor" href="#_jenkins_server_migration"></a>Jenkins server migration</h4>
+<div class="paragraph">
+<p>One scenario that bears mentioning is if the CI toolchain was deployed to ICP,
+typically using the community Helm chart. For example, In the BlueCompute case,
+this was done using a containerized Jenkins instance. All of the stages in the
+pipelines run as containers in Kubernetes using the Kubernetes plugin.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes" class="bare">https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes</a></p>
+</div>
+<div class="paragraph">
+<p>The best practice around Jenkins is for the pipelines themselves to be written using a declarative <code>Jenkinsfile</code> stored with the code.
+The pipeline logic is stored with the application source code and itself treated as part of the application.
+In BlueCompute, Jenkinsfiles are stored with each microservice, so we only needed to create an instance of Jenkins in Openshift and import the pipelines to get our builds to work.</p>
+</div>
+<div class="paragraph">
+<p>Openshift has both ephemeral and persistent Jenkins in the catalog which is very comparable to the Jenkins Helm chart.
+This instance of Jenkins will automatically install the Kubernetes and Openshift client plugins, so Jenkinsfile that uses podTemplates that spin up containers to run stages in the pipeline should "just work".</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_jenkins_pipeline_stages_as_containers_in_openshift"><a class="anchor" href="#_running_jenkins_pipeline_stages_as_containers_in_openshift"></a>Running Jenkins pipeline stages as containers in Openshift</h4>
+<div class="paragraph">
+<p>As pipeline stages are run in containers, there are security issues when a particular stage attempts to run a container that requires root access, mounts a hostpath, etc, just like application containers.
+Most runtime build images don’t need to run as root (e.g. maven, gradle, etc), which means they should run just fine in Openshift.</p>
+</div>
+<div class="paragraph">
+<p>One security problem when using Kubernetes plugin is how to build the container image itself, which must run in a container.
+In Openshift this is further complicated that the default <code>restricted</code> SCC disallows hostmounting the docker socket, running as root, or running in privileged mode without changing the SCC.
+The community is still attempting to resolve this problem, since traditionally the Docker tool requires root and many of the functions involved in building a container image requires various elevated privileges.</p>
+</div>
+<div class="paragraph">
+<p>There are a few projects at various stages in development as of this writing that can build container images without docker, which run fine outside of a container, but none are perfect inside of a container.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/GoogleContainerTools/kaniko">kaniko</a></p>
+</li>
+<li>
+<p><a href="https://github.com/cyphar/orca-build">orca-build</a></p>
+</li>
+<li>
+<p><a href="https://github.com/genuinetools/img">img</a></p>
+</li>
+<li>
+<p><a href="https://github.com/uber/makisu">makisu</a></p>
+</li>
+<li>
+<p><a href="https://github.com/containers/buildah">buildah</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When using these tools, we can relax the security constraints on them by adding the SCC to the <code>jenkins</code> service account in the namespace where the pod runs.
+For example, kaniko only requires <code>root</code> access, so we can simply add the <code>anyuid</code>
+scc to enable kaniko:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc adm policy add-scc-to-user anyuid -z jenkins</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note the security implications of the above.
+While containers are running with elevated privileges, any other workload running on the same worker node may be vulnerable, as Jenkins build stages may run as root.
+Additionally since the developer controls the commands used in the pipeline stage, this essentially gives developers root access on the worker node the build runs on.
+In shared clusters, it may make sense to use a <code>nodeSelector</code> on all projects where jenkins will run to isolate jenkins workloads to just a few nodes: <a href="https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#setting-the-project-wide-node-selector" class="bare">https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#setting-the-project-wide-node-selector</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_migration_of_container_builds_to_openshift_buildconfigs"><a class="anchor" href="#_migration_of_container_builds_to_openshift_buildconfigs"></a>Migration of Container builds to Openshift BuildConfigs</h4>
+<div class="paragraph">
+<p>If we are running the Jenkins pipeline stages in Jenkins on Openshift, we can leverage the <a href="https://github.com/openshift/jenkins-client-plugin">Openshift Jenkins client plugin</a> and the <a href="https://docs.openshift.com/container-platform/3.11/dev_guide/builds/index.html#defining-a-buildconfig">Openshift BuildConfig</a> to build the container image, which provides a controlled environment for producing the container image without exposing <code>root</code> access on any worker nodes.
+By providing just a <code>Dockerfile</code> and a build context, Openshift will build and push the resulting image to the Openshift private registry and track it using an ImageStream, and we can then provide an
+additional stage using <a href="https://github.com/containers/skopeo">skopeo</a> to push this to an external registry.
+BuildConfig limits the amount of damage the developer can do because they are not explicitly running commands as root.</p>
+</div>
+<div class="paragraph">
+<p>We have posted an example pipeline we used at a customer that leverages this at the following git repository:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/jkwong888/liberty-hello-world-openshift/blob/master/Jenkinsfile" class="bare">https://github.com/jkwong888/liberty-hello-world-openshift/blob/master/Jenkinsfile</a></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_continuous_deployment_and_gitops_adoption"><a class="anchor" href="#_continuous_deployment_and_gitops_adoption"></a>Continuous Deployment and GitOps adoption</h4>
+<div class="sect4">
+<h5 id="_gitops_migration"><a class="anchor" href="#_gitops_migration"></a>GitOps Migration</h5>
+<div class="paragraph">
+<p>In some of our previous CICD examples, we tightly coupled Continuous Integration (CI) with Continuous Deployment (CD) in a single pipeline.
+This makes it difficult for deployments to become portable as the build is highly dependent on the deployment target.</p>
+</div>
+<div class="paragraph">
+<p>The community has been moving toward declarative deployment and some terms like <a href="https://www.weave.works/technologies/gitops/">GitOps</a> have been gaining popularity.
+In this model, CI performs pre-release verification with build and test of the application.
+The output of CI is the "document" that describes what to deploy, which in Kubernetes includes the container image, and the associated resource yamls that can also be packaged into Helm charts or kustomize applcations.
+We leave the "how" and "where" to deploy to CD.
+In some organizations these are separate (sometimes siloed) organizations, so the "document" approach allows a better separation of concerns.</p>
+</div>
+<div class="paragraph">
+<p>In true GitOps, all operations have a matching action in git (pull requests, merges, etc).
+Deployment documents are committed to a git repo, which can trigger webhooks to begin the CD process.
+Code promotion involves merges to git repos representing the desired state of upper environments.
+The git commit log could be used for approval and deployment history but probably shouldn&#8217;t be used for audit (as git history can be manipulated).</p>
+</div>
+<div class="paragraph">
+<p>We have posted a sample CI pipeline where we decoupled the CI from the CD. (link to be provided)</p>
+</div>
+<div class="paragraph">
+<p>As there is no upgrade path from Openshift 3.x to Openshift 4.x, separating CI from CD and adopting GitOps will allow you to add a new Openshift 4.x environment as an additional deployment target with minimal effort.
+Having a single repository representing a deployment to a target environment also allows us to scale out to additional target environments as application adoption requires it.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_decoupling_cd_from_ci"><a class="anchor" href="#_decoupling_cd_from_ci"></a>Decoupling CD from CI</h5>
+<div class="paragraph">
+<p>As CI is common to both ICP and Openshift platforms, when we move to a declarative deployment model, the CD is the only part that changes.
+A first step toward GitOps and declarative deployments is to decouple CD from CI.</p>
+</div>
+<div class="paragraph">
+<p>In our Bluecompute case study, we had tightly coupled CI/CD pipelines and broke it into two, CI, and CD (to dev).
+The end of our CI process generates an image, and embeds the URL into Kubernetes yamls and pushes it to a second Git repository representing a deployment.
+The CD pipeline is triggered from changes to the deployment git repository, which executes a deployment script (in jenkins) into the target environments.
+Generally we can expect one target environment type (e.g. dev, qa, stage, prod)per git repository, and one pipeline per environment (e.g. prod-east, prod-west).
+It&#8217;s important to be as declarative as possible.</p>
+</div>
+<div class="paragraph">
+<p>There are a few projects, including <a href="https://razee.io">Razee</a> (included with Cloud Pak for Applications), that can monitor and perform deployments from git repositories.
+Ideally, the deployment is performed from inside the target environment to reduce the number of credentials being stored in the deployment system.
+When these projects mature, we can migrate to them.
+For now, we used our existing Jenkins server to monitor and perform the deployment.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_using_a_service_account_from_outside_of_the_platform_to_perform_deployment"><a class="anchor" href="#_using_a_service_account_from_outside_of_the_platform_to_perform_deployment"></a>Using a service account from outside of the platform to perform deployment</h5>
+<div class="paragraph">
+<p>Openshift ships with a service account in each project <code>deployer</code>, and a  cluster role <code>system:deployer</code> which contains some permissions it uses internally to perform <code>DeploymentConfig</code> rollouts.
+As we are not using <code>DeploymentConfig</code>, this was not enough for our CD process, since all of the permissions are against the built-in Openshift resources.</p>
+</div>
+<div class="paragraph">
+<p>In some of our client engagements, the CD process performs a deployment using a service account that has limited privileges.
+For our Bluecompute case study, we created a <code>jenkins</code> service account that performs the deployment in the target namespace.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc create serviceaccount jenkins -n bluecompute</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We created the following <code>deployer</code> clusterrole that allows a CD tool to do its job on generic Kubernetes resources:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    openshift.io/description: Grants the right to deploy within a project.  Used primarily
+      with service accounts for automated deployments.
+    openshift.io/reconcile-protect: "false"
+  name: deployer
+rules:
+- apiGroups:
+  - extensions
+  attributeRestrictions: null
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - ingresses
+  - networkpolicies
+  - replicasets
+  - replicasets/scale
+  - replicationcontrollers/scale
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we apply this new role and also the <code>view</code> role to the <code>jenkins</code> service account so it can see the project.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc adm policy add-role-to-user view system:serviceaccounts:bluecompute:jenkins
+oc adm policy add-role-to-user deployer system:serviceaccounts:bluecompute:jenkins</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can also generate the <code>kubeconfig.yaml</code> needed for our CD tool to connect to the cluster.
+First, find the serviceaccount token:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc describe serviceaccount jenkins
+Name:                jenkins
+Namespace:           bluecompute
+Labels:              &lt;none&gt;
+Annotations:         &lt;none&gt;
+Image pull secrets:  jenkins-dockercfg-gmhlq
+Mountable secrets:   jenkins-token-r4rcs
+                     jenkins-dockercfg-gmhlq
+Tokens:              jenkins-token-b7lvw
+                     jenkins-token-r4rcs
+Events:              &lt;none&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Get the token from the secret, which looks like a JWT.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc describe secret jenkins-token-b7lvw
+Name:         jenkins-token-b7lvw
+Namespace:    bluecompute
+Labels:       &lt;none&gt;
+Annotations:  kubernetes.io/created-by=openshift.io/create-dockercfg-secrets
+              kubernetes.io/service-account.name=jenkins
+              kubernetes.io/service-account.uid=64aed8e2-c900-11e9-b106-005056a86156
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:          1070 bytes
+namespace:       11 bytes
+service-ca.crt:  2186 bytes
+token:           eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a new kubeconfig yaml and log in to openshift using the token:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>export KUBECONFIG=/tmp/jenkins-kubeconfig.yaml
+oc login &lt;openshift URL&gt; --token=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The file <code>/tmp/jenkins-kubeconfig.yaml</code> now contains the configuration including embedded credentials for connecting to Openshift as the service account.
+Use caution when distributing this file as the token does not expire.
+In our Bluecompute case study, we stored this as a "Secret file" credential in Jenkins.
+You can invoke the API, for example to patch a deployment, using:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>kubectl --kubeconfig=&lt;mykubeconfig&gt; apply -f deployment.yaml</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_performing_deployments_from_inside_the_platform"><a class="anchor" href="#_performing_deployments_from_inside_the_platform"></a>Performing deployments from inside the platform</h5>
+<div class="paragraph">
+<p>As the number of environments increases, it can become difficult to manage credentials for each environments, particular if they are dynamically created using Terraform, Cluster API, or some other infrastructure automation.
+One interesting model is to run a controller or operator from inside each cluster that is created and have it monitor the git repository to perform deployments.
+<a href="https://razee.io">Razee</a> is one such project, but there are others, including <a href="https://argoproj.github.io/argo-cd/">ArgoCD</a>.
+Another approach is to just run a simple <a href="https://tekton.dev">Tekton</a> pipeline that monitors git repository changes and executes the deployment as the service account from within the cluster.
+This way the credentials do not need to be extracted from each cluster as it is created and managed individually.</p>
+</div>
+<div class="paragraph">
+<p>We will publish an example of this (link to be provided).</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_migration_of_kubernetes_artifacts"><a class="anchor" href="#_migration_of_kubernetes_artifacts"></a>Migration of Kubernetes Artifacts</h4>
+<div class="sect4">
+<h5 id="_deploymentconfig_vs_deployment"><a class="anchor" href="#_deploymentconfig_vs_deployment"></a>DeploymentConfig vs Deployment</h5>
+<div class="paragraph">
+<p>Openshift has its own deployment resources called <code>DeploymentConfig</code> and <code>ReplicationController</code>.
+These pre-date the <code>Deployment</code> concept in Kubernetes and provide some additional functionality such as the ability to trigger deployments from upstream image changes.
+As Openshift supports these same Kubernetes-native objects, the least effort in a migration is to reuse the resources used to deploy to ICP.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_routes_vs_ingress"><a class="anchor" href="#_routes_vs_ingress"></a>Routes vs Ingress</h5>
+<div class="paragraph">
+<p>Openshift also has the concept of <code>Route</code> instead of <code>Ingress</code>, which predates the first-class <code>Ingress</code> object.
+Openshift will automatically convert <code>Ingress</code> resources to a <code>Route</code> and exposes them through the router.
+See here for more information:
+<a href="https://blog.openshift.com/kubernetes-ingress-vs-openshift-route/" class="bare">https://blog.openshift.com/kubernetes-ingress-vs-openshift-route/</a></p>
+</div>
+<div class="paragraph">
+<p>As the implementation of how ingress resources are exposed are dependent on the ingress controller type, there are some features that are not available in Openshift routes.
+One popular example is path-rewrites supported by annotations, which were performed by the nginx ingress controller in ICP.
+A mitigation to this is to add the nginx ingress controller between the router and services in Openshift that monitors a specific ingress class, and expose the nginx ingress controller through a route.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_helm_charts"><a class="anchor" href="#_helm_charts"></a>Helm Charts</h5>
+<div class="paragraph">
+<p>Some development organizations may have adopted use of Helm Charts as a packaging mechanism for Kubernetes resources.
+As has been discussed frequently, Openshift does not natively support Helm chart based deployment.
+This is because it is difficult to configure the server-side component (Tiller) in a secure manner.
+Helm does have some advantages, such as a robust templating language, versioning, and package dependency management.
+A lot of community software is already packaged as Helm charts, although many of them do not work out of the box due in Openshift to problems with <code>SecurityContextConstraints</code> (discussed earlier).</p>
+</div>
+<div class="paragraph">
+<p>If Helm charts are already used for package distribution in your application, we can continue to package applications using them as part of the deployment artifacts.
+The deployment artifact in this case becomes the Helm chart in addition to generating the deployment values (i.e. <code>values.yaml</code>).
+The deployment procedure involves rendering the template locally into raw Kubernetes yamls (<code>helm template</code>), then deploying them using the <code>kubectl</code> or <code>oc</code> CLI into the target cluster.
+We have documented the approach here:
+<a href="https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/spring/docs/openshift/README.md" class="bare">https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/spring/docs/openshift/README.md</a></p>
+</div>
+<div class="paragraph">
+<p>Helm v3, which is currently in beta, is also a possibility for client-side rendering, as tiller is embedded into the helm client and there is no server-side component.  See the recent announcement about the beta as well as the related documentation:
+<a href="https://helm.sh/blog/helm-v3-beta/" class="bare">https://helm.sh/blog/helm-v3-beta/</a></p>
+</div>
+<div class="paragraph">
+<p>In the near term, Cloud Paks are distributed as Helm charts and the ICP common services layer will include server side tiller.
+However it is not recommended to depend on this for application deployment as Cloud Pak will be moving away from server-side Tiller and into an Operator model.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_a_backup_restore_approach_using_velero"><a class="anchor" href="#_using_a_backup_restore_approach_using_velero"></a>Using a Backup/Restore approach using Velero</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_converting_podsecuritypolicy_to_securitycontextconstraints"><a class="anchor" href="#_converting_podsecuritypolicy_to_securitycontextconstraints"></a>Converting PodSecurityPolicy to SecurityContextConstraints</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_networkpolicy_migration"><a class="anchor" href="#_networkpolicy_migration"></a>NetworkPolicy migration</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_application_loadbalancer_cutover"><a class="anchor" href="#_application_loadbalancer_cutover"></a>Application LoadBalancer cutover</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_storage_migration"><a class="anchor" href="#_storage_migration"></a>Storage Migration</h3>
+<div class="sect3">
+<h4 id="_storage_migration_2"><a class="anchor" href="#_storage_migration_2"></a>Storage Migration</h4>
+<div class="paragraph">
+<p>We will focus on Kubernetes Storage under the context of ICP to OCP migration.
+For detail storage and Kubernetes usage, please reference the
+<a href="https://ibm-cloud-architecture.github.io/kubernetes-storage-cookbook/">Kubernetes
+Storage Cookbook</a>.</p>
+</div>
+<div class="paragraph">
+<p>The migration has to take into consideration of both the Kubernetes Storage
+Provider and Storage consumer (database or application).</p>
+</div>
+<div class="sect4">
+<h5 id="_storage_provider"><a class="anchor" href="#_storage_provider"></a>Storage Provider</h5>
+<div class="paragraph">
+<p>In general, Kubernetes supports quite a few storage providers including
+hostPath, NFS, Ceph, Gluster, vSphere, minio, Cloud-based storage (S3 etc.). And
+these providers can be deployed either as a part of a Kubernetes cluster
+(internal storage) or storage provided by an external service (external
+storage). For the migration, we’ll focus on the internal storage or in-cluster
+storage provider.</p>
+</div>
+<div class="paragraph">
+<p>Following storage can be hosted on ICP cluster nodes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>GlusterFS</p>
+</li>
+<li>
+<p>Ceph block storage by using Rook</p>
+</li>
+<li>
+<p>Minio</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Red Hat OpenShift support both GluserFS and Ceph as in-cluster storage
+providers. Haven’t heard the official support for Minio.</p>
+</div>
+<div class="paragraph">
+<p>There is no migration path or tools available to migrate ICP storage nodes to
+OpenShift. So, it boils down to handle the migration from the storage consumer’s
+aspect.</p>
+</div>
+<div class="paragraph">
+<p>If you are using external storage provider, as far as it is supported by
+OpenShift (all do except Minio), you just need to migrate the storage consumer
+and leave the external storage provider as-is.</p>
+</div>
+<div class="paragraph">
+<p>If you are using internal storage provider, you need to setup the OpenShift
+Storage nodes, either GlusterFS or Ceph, using the same/similar spec as in ICP
+in terms of disk size, storage type, number of nodes. Then, proceed to storage
+consumer migration.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_storage_consumer"><a class="anchor" href="#_storage_consumer"></a>Storage Consumer</h5>
+<div class="paragraph">
+<p>Each client might have different storage consumption pattern, we’ll try to
+categorize them into the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Container applications requires persistent Storage</p>
+</li>
+<li>
+<p>Kubernetes Statefulset application</p>
+</li>
+<li>
+<p>Databases running on Kubernetes such as MongoDB, MySQL, Cloudant etc.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We’ll assume that all these storage needs are implemented as Kubernetes
+recommended Persistent Volume (PV) and Persistent Volume Claims (PVC).</p>
+</div>
+<div class="paragraph">
+<p>When it comes to migration to OCP, it really becomes a storage backup and
+restore discussion. Depends on the storage consumer type (database vs. custom
+application), it can be done with:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Kubernetes PV backup and restore</p>
+</li>
+<li>
+<p>Using Application/Database native backup-restore tools</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This guide will be focus on the first approach where you migrate kubernetes PV.</p>
+</div>
+<div class="paragraph">
+<p>One common approach of backing up Kubernetes PV is the
+<a href="https://github.com/heptio/velero">Velero project</a> from Heptio. The concept is
+Velero will take your PV snapshots, stores it on object storage (like S3 or
+Minio). Then, you can restore it to another Kubernetes cluster.</p>
+</div>
+<div class="paragraph">
+<p>For detail on how the tool works in generic Kubernetes, please reference
+<a href="https://blog.kubernauts.io/backup-and-restore-of-kubernetes-applications-using-heptios-velero-with-restic-and-rook-ceph-as-2e8df15b1487">this
+blog post</a></p>
+</div>
+<div class="paragraph">
+<p>Still, there are some limitations with Velero approach. For example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It does not support the migration of persistent volumes across cloud
+providers.</p>
+</li>
+<li>
+<p>Velero + Restic currently supports backing up to only S3 compatible object
+storage.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_platform_data_migration"><a class="anchor" href="#_platform_data_migration"></a>Platform Data Migration</h3>
+<div class="sect3">
+<h4 id="_monitoring_data"><a class="anchor" href="#_monitoring_data"></a>Monitoring Data</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_historical_log_data"><a class="anchor" href="#_historical_log_data"></a>Historical Log Data</h4>
+
+</div>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

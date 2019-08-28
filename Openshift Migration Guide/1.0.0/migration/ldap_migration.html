@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <meta name="generator" content="Antora 1.1.1">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../migration_strategy.html">Migration Strategy</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="ldap_migration.html">User Authentication Migration – LDAP</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="rbac_migration.html">User Authorization Migration - RBAC</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="storage.html">Storage migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="app_resource_migration.html">App resource migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jenkins_migration.html">Jenkins server migration</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../key_differences.html">Key Differences</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main role="main">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Openshift Migration Guide</a></li>
+    <li>Migration</li>
+    <li><a href="ldap_migration.html">User Authentication Migration – LDAP</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///antora/modules/ROOT/pages/migration/ldap_migration.adoc">Edit this Page</a></div>
+</div>
+<article class="doc">
+<div class="sect3">
+<h4 id="_user_authentication_migration_ldap"><a class="anchor" href="#_user_authentication_migration_ldap"></a>User Authentication migration – LDAP</h4>
+<div class="paragraph">
+<p>Kubernetes does not have users; it’s up to the Kubernetes distribution to
+provide an authentication endpoint that performs user authentication and
+identity mapping to either a User or a Group. Kubernetes does have roles and
+cluster roles, which are used to group permissions, and rolebindings and
+clusterrolebindings, which are used to assign permissions to particular users or
+groups.</p>
+</div>
+<div class="paragraph">
+<p>For more information about how authentication is implemented in Kubernetes, see:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://kubernetes.io/docs/reference/access-authn-authz/authentication/" class="bare">https://kubernetes.io/docs/reference/access-authn-authz/authentication/</a></p>
+</div>
+<div class="paragraph">
+<p>In ICP, the internal auth-idp component is used as an OIDC provider that
+authenticates users. This component can be configured from the UI and will
+connect to LDAP on behalf of the cluster to authenticate users. The <code>Teams</code>
+concept is used to group together users or groups from LDAP into logical groups
+and is managed by the auth-idp component and persisted in mongodb.</p>
+</div>
+<div class="paragraph">
+<p>Openshift 3.11 has a similar component embedded in the API server that performs
+authentication on behalf of the cluster. However, it does not have a UI to
+configure LDAP, so it takes some work during installation or after installation
+to configure LDAP.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider" class="bare">https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LDAPPasswordIdentityProvider</a></p>
+</div>
+<div class="paragraph">
+<p>Openshift 4.x uses a separate operator to perform authentication, and another
+operator manages that operator and its configuration using a
+CustomResourceDefinition to configure LDAP and other identity providers.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-ldap-identity-provider.html" class="bare">https://docs.openshift.com/container-platform/4.1/authentication/identity_providers/configuring-ldap-identity-provider.html</a></p>
+</div>
+<div class="paragraph">
+<p>In our migration scenario, we specifically we looked at migrating an existing
+ICP LDAP connection to Openshift 3.11.</p>
+</div>
+<div class="paragraph">
+<p>Our LDAP server had the following contents:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>dn: dc=internal-network,dc=local
+dc: internal-network
+objectClass: top
+objectClass: domain
+
+dn: cn=ldapadm,dc=internal-network,dc=local
+objectClass: organizationalRole
+cn: ldapadm
+
+dn: ou=People,dc=internal-network,dc=local
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Group,dc=internal-network,dc=local
+objectClass: organizationalUnit
+ou: Group
+
+dn: cn=binduser,dc=internal-network,dc=local
+cn: binduser
+objectClass: organizationalRole
+objectClass: top
+objectClass: simpleSecurityObject
+
+dn: cn=user1,ou=People,dc=internal-network,dc=local
+cn: user1
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: one
+uid: user1
+
+dn: cn=dev1,ou=Group,dc=internal-network,dc=local
+cn: dev1
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=user1,ou=People,dc=internal-network,dc=local
+uniqueMember: cn=user2,ou=People,dc=internal-network,dc=local
+
+dn: cn=user2,ou=People,dc=internal-network,dc=local
+cn: user2
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: user two
+uid: user2
+
+dn: cn=clusteradmin,ou=People,dc=internal-network,dc=local
+cn: clusteradmin
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: cluster admin
+uid: clusteradmin
+
+dn: cn=admin,ou=Group,dc=internal-network,dc=local
+cn: admin
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=clusteradmin,ou=People,dc=internal-network,dc=local
+
+dn: cn=dev2,ou=Group,dc=internal-network,dc=local
+cn: dev2
+objectClass: groupOfUniqueNames
+objectClass: top
+uniqueMember: cn=user3,ou=People,dc=internal-network,dc=local
+uniqueMember: cn=user4,ou=People,dc=internal-network,dc=local
+
+dn: cn=user3,ou=People,dc=internal-network,dc=local
+cn: user3
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: three
+uid: user3
+
+dn: cn=user4,ou=People,dc=internal-network,dc=local
+cn: user4
+objectClass: person
+objectClass: simpleSecurityObject
+objectClass: uidObject
+objectClass: top
+sn: four
+uid: user4</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The ICP configuration appeared as follows:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="../_images/image1.png" alt="LDAP settings in ICP">
+</div>
+</div>
+<div class="paragraph">
+<p>The matching Openshift configuration was configured under identityProviders on
+each master host in /etc/origin/master/master-config.yaml. Once this was
+configured we restarted docker on each master host to restart the API server.
+The configuration is as follows:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>identityProviders:
+  - name: "rhos-ldap"
+    challenge: true
+    login: true
+    mappingMethod: claim
+    provider:
+      apiVersion: v1
+      kind: LDAPPasswordIdentityProvider
+      attributes:
+        id:
+        - dn
+        email:
+        - mail
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: "cn=binduser,dc=internal-network,dc=local"
+      bindPassword: "Letmein"
+      insecure: true
+      url: "ldap://192.168.100.4:389/dc=internal-network,dc=local?uid?sub?(objectclass=person)"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pay particular interest to the url. The format of the URL is</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>ldap://host:port/basedn?attribute?scope?filter</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We have translated this from the ICP configuration, where <code>attribute</code> and
+<code>filter</code> are built from the <code>User filter</code> in the ICP configuration. The
+query it uses is:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>(&amp;(attribute=%v)(filter))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Openshift has explicit <code>user</code> and <code>group</code> resources which the API server
+manages. You can list them using the familiar <code>oc get users</code> and <code>oc get
+groups</code> commands as well as create additional ones.</p>
+</div>
+<div class="paragraph">
+<p>As Openshift is a developer platform, the default mappingMethod <code>claim</code> allows
+anybody that successfully authenticates access to the platform to login and
+create projects. When authentication is successful, the platform will create a
+<code>user</code> resource automatically. The ICP model denies access to any users in
+LDAP that are not part of a team. To match the ICP model and deny access to
+anybody not explicitly added to Openshift there are two options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>use the mappingMethod <code>lookup</code>. However this requires additional overhead as
+the administrator must individually create users in the Openshift platform
+before they are given access to log in to Openshift.</p>
+<div class="paragraph">
+<p><a href="https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LookupMappingMethod" class="bare">https://docs.openshift.com/container-platform/3.11/install_config/configuring_authentication.html#LookupMappingMethod</a></p>
+</div>
+<div class="paragraph">
+<p>In our case, we created a user for user1, created an identity for it in ldap,
+and then mapped them together:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc create user user1
+user.user.openshift.io/user1 created
+
+$ oc create identity rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local
+identity.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local created
+
+$ oc create useridentitymapping rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local user1
+useridentitymapping.user.openshift.io/rhos-ldap:cn=user1,ou=People,dc=internal-network,dc=local created</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Leave the default mappingMethod <code>claim</code> but deny access to create new
+projects in Openshift. By default the <code>system:authenticated</code> group
+(i.e. anybody in LDAP) is given the <code>self-provisioner</code> cluster-role, which
+allows project creation. Removing the role removes the overhead of having to
+create new users as they log in, but also prevents authenticated users from
+consuming resources in the platform without cluster administrator action. See:
+<a href="https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#disabling-self-provisioning" class="bare">https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#disabling-self-provisioning</a></p>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kubernetes.io/autoupdate": "false" } } }'
+$ oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'</pre>
+</div>
+</div>
+</li>
+<li>
+<p>We think this matches ICP the closest, but allowing users to create projects
+on their own has some advantages in developer scenarios. Using the above policy
+makes sense in production clusters but can be relaxed in development/test
+clusters.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_group_migration_ldap"><a class="anchor" href="#_group_migration_ldap"></a>Group migration – LDAP</h4>
+<div class="paragraph">
+<p>Note that the Openshift api server does not query groups from LDAP; group
+definitions must be synced manually. The documentation around this is here:
+<a href="https://docs.openshift.com/container-platform/3.11/install_config/syncing_groups_with_ldap.html" class="bare">https://docs.openshift.com/container-platform/3.11/install_config/syncing_groups_with_ldap.html</a></p>
+</div>
+<div class="paragraph">
+<p>In our scenario we had users in the tree under ou=People, and groups under
+ou=Group. Three groups were created (dev1, dev2, and admins). We used the
+following rfc2307 LDAP sync config:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://192.168.100.4:389/dc=internal-network,dc=local
+bindDN: "cn=binduser,dc=internal-network,dc=local"
+bindPassword: "Letmein"
+insecure: true
+rfc2307:
+    groupsQuery:
+        baseDN: "ou=Group,dc=internal-network,dc=local"
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+        filter: "(objectclass=groupOfUniqueNames)"
+    groupUIDAttribute: dn
+    groupNameAttributes: [ cn ]
+    groupMembershipAttributes: [ uniqueMember ]
+    usersQuery:
+        baseDN: "ou=People,dc=internal-network,dc=local"
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+    userUIDAttribute: dn
+    userNameAttributes: [ uid ]
+    tolerateMemberNotFoundErrors: false
+    tolerateMemberOutOfScopeErrors: false</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe how this maps to the configuration in ICP; the groups are of object
+class <code>groupOfUniqueNames</code> and the <code>uniqueMember</code> attribute contains the
+members of the group which will be in turn queried.</p>
+</div>
+<div class="paragraph">
+<p>Running this command will add some Openshift <code>Group</code> resources that can be
+assigned roles.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ oc adm groups sync --sync-config=rfc2307_config.yaml  --confirm
+group/dev1
+group/admin
+group/dev2</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The result is three groups, with the user mappings as shown.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc get groups
+NAME      USERS
+admin     clusteradmin
+dev1      user1, user2
+dev2      user3, user4</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As this is a manual process that produces static user/group mappings, it may be
+required to run this on a schedule that updates and prunes groups in an ongoing
+basis.</p>
+</div>
+<div class="paragraph">
+<p>One additional implementation note is that Openshift issues Opaque tokens; since
+the authentication module is embedded in the API server it is able to validate
+the tokens internally. In ICP, the authentication token issued by the auth
+service is a signed JWT that contains an embedded list of groups that Kubernetes
+uses to validate permissions. In the next session when we discuss RBAC, we can
+see how rolebindings and clusterrolebindings are bound to these groups.</p>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

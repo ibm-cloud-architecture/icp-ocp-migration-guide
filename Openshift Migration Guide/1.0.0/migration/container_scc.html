@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <meta name="generator" content="Antora 1.1.1">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../migration_strategy.html">Migration Strategy</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ldap_migration.html">User Authentication Migration – LDAP</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="rbac_migration.html">User Authorization Migration - RBAC</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="storage.html">Storage migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="app_resource_migration.html">App resource migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jenkins_migration.html">Jenkins server migration</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../key_differences.html">Key Differences</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main role="main">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Openshift Migration Guide</a></li>
+    <li>Migration</li>
+    <li><a href="container_scc.html">Security Context Constraints</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///antora/modules/ROOT/pages/migration/container_scc.adoc">Edit this Page</a></div>
+</div>
+<article class="doc">
+<div class="sect3">
+<h4 id="_using_a_code_nonroot_code_securitycontextconstraint"><a class="anchor" href="#_using_a_code_nonroot_code_securitycontextconstraint"></a>Using a <code>nonroot</code> SecurityContextConstraint</h4>
+<div class="paragraph">
+<p>In cases where existing shared storage is attached to the container as a volume,
+and the container must write to the filesystem as a particular uid, we can run
+the pod under a service account, and assign the "nonroot" scc to the service
+account. This relaxes the restrictions on the uid and allows the container
+process to be executed as some specific UID, but not root. This is essentially
+equivalent to ICP’s <code>ibm-restricted-psp</code> security policy. For example, in our
+above example our MySQL container runs as uid 5984, but Openshift blocks the
+execution since the uid is not within the allowed range for<code>restricted</code> SCC, so
+we created a service account <code>inventory-mysql</code> for the pod, allow it to use
+the <code>nonroot</code> SCC and set the deployment to run as this service account.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc create serviceaccount inventory-mysql
+$ oc adm policy add-scc-to-user nonroot -z inventory-mysql
+$ oc patch deploy/inventory-mysql --patch \
+     '{"spec":{"template":{"spec":{"serviceAccountName":"inventory-myql"}}}}}'</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_code_anyuid_code_seucirtycontextconstraint"><a class="anchor" href="#_using_code_anyuid_code_seucirtycontextconstraint"></a>Using <code>anyuid</code> SeucirtyContextConstraint</h4>
+<div class="paragraph">
+<p>In cases where running as the root user is absolutely necessary, we can leverage
+a serviceaccount and assign the <code>anyuid</code> SCC to allow the container to run as
+root. For example, in our BlueCompute reference application, couchdb only works
+when it runs as root due to the way it tries to change ownership of the data
+directories. We will allow couchdb to run as root user:</p>
+</div>
+<div class="paragraph">
+<p>Steps in ICP:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ kubectl ceate serviceaccount -n bluecompute customer-couchdb
+$ kubectl create role psp-ibm-anyuid-psp -n bluecompute --verb=use \
+     --resource=podsecuritypolicy --resource-name=ibm-anyuid-psp
+$ kubectl create rolebinding couchdb-ibm-anyuid-psp -n bluecompute \
+     --role=psp-ibm-anyuid-psp --serviceaccount=bluecompute:customer-couchdb</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we add the serviceaccount to the podspec in the statefulset.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ kubectl patch deploy/couchdb --patch \
+     '{"spec":{"template":{"spec":{"serviceAccountName":"customer-couchdb"}}}}}'</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Similarly, in Openshift:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc create serviceaccount -n bluecompute customer-couchdb
+$ oc adm policy add-scc-to-user anyuid -z customer-couchdb
+$ oc patch deploy/couchdb --patch \
+     '{"spec":{"template":{"spec":{"serviceAccountName":"customer-couchdb"}}}}}'</pre>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

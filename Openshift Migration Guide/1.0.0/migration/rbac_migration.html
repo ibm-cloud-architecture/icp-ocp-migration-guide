@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <meta name="generator" content="Antora 1.1.1">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../migration_strategy.html">Migration Strategy</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ldap_migration.html">User Authentication Migration – LDAP</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="rbac_migration.html">User Authorization Migration - RBAC</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="storage.html">Storage migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="app_resource_migration.html">App resource migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jenkins_migration.html">Jenkins server migration</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../key_differences.html">Key Differences</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main role="main">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Openshift Migration Guide</a></li>
+    <li>Migration</li>
+    <li><a href="rbac_migration.html">User Authorization Migration - RBAC</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///antora/modules/ROOT/pages/migration/rbac_migration.adoc">Edit this Page</a></div>
+</div>
+<article class="doc">
+<div class="sect3">
+<h4 id="_user_authorization_migration_rbac"><a class="anchor" href="#_user_authorization_migration_rbac"></a>User Authorization Migration (RBAC)</h4>
+<div class="paragraph">
+<p>Kubernetes ships with some out of box user-facing cluster roles:
+<a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles" class="bare">https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles</a></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>cluster-admin</code></p>
+</li>
+<li>
+<p><code>admin</code></p>
+</li>
+<li>
+<p><code>edit</code></p>
+</li>
+<li>
+<p><code>view</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>ICP ships with five additional user-facing cluster roles which correspond to the
+roles used in teams:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>icp:admin</code></p>
+</li>
+<li>
+<p><code>icp:edit</code></p>
+</li>
+<li>
+<p><code>icp:operate</code></p>
+</li>
+<li>
+<p><code>icp:teamadmin</code></p>
+</li>
+<li>
+<p><code>icp:view</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These are implemented as aggregated roles, which means there are several roles
+where their permissions are union-ed together to provide a full set of
+permissions for the user. The permissions are contained in aggregate roles. Note
+that the admin role contains all of the permissions that the edit role contains,
+etc.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>icp-admin-aggregate</code></p>
+</li>
+<li>
+<p><code>icp-edit-aggregate</code></p>
+</li>
+<li>
+<p><code>icp-operate-aggregate</code></p>
+</li>
+<li>
+<p><code>icp-view-aggregate</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Openshift ships with four user-facing cluster roles:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>admin</code></p>
+</li>
+<li>
+<p><code>basic-user</code></p>
+</li>
+<li>
+<p><code>edit</code></p>
+</li>
+<li>
+<p><code>view</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Since RBAC is common in both Openshift and ICP, it’s tempting to just export
+these 9 roles to Openshift. However, some Openshift-specific resources are added
+to the Kubernetes out-of-box roles. These are in the <code>*.openshift.io</code>
+apiGroups defined in the roles for the above.</p>
+</div>
+<div class="paragraph">
+<p>As clusterroles are whitelists of permissions, and access in Kubernetes is a
+union of all of the roles bound to the identity, one potential way of quickly
+migrating permissions is to import the cluster roles from ICP, assign the ICP
+roles to the users and groups, then assign the Openshift <code>view</code> role to all
+users so that the projects will appear in the CLI and UI. The Openshift <code>view</code>
+role will overlap with the <code>icp:view</code> role but the Openshift <code>view</code> role
+will enable view of the Openshift specific resources (e.g. projects, builds,
+etc). This will allow the same access to the Kubernetes API that was assigned in
+ICP. Additional access to Openshift specific objects (e.g. to create a build,
+deployment configs, etc) may be added by assigning Openshift specific roles like
+<code>edit</code>, <code>admin</code>, etc.</p>
+</div>
+<div class="paragraph">
+<p>Here is one team that we created with the following group/user mappings:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cloudctl iam team-get dev-1
+Name: dev1
+ID: dev-1
+
+ID      Type    Name    Email   Roles
+dev1    group   -       -       Viewer
+user1   user    user1   -       Administrator</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the following resources assigned:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ cloudctl iam resources -t dev-1
+CRN
+crn:v1:icp:private:k8:jkwong-icp-31-cluster:n/dev1:::</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We exported the 9 ICP roles from ICP as yamls, and imported them into openshift.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ kubectl get clusterroles | grep icp | awk '{print $1}' | xargs -n1 -I{} kubectl get clusterrole {} -o yaml  | tee  all-roles.yaml
+
+...
+
+$ oc apply -f all-roles.yaml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we created the associated resources (i.e. the namespace/project) and mapped
+the same permissions using the following commands:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc new-project dev1
+Now using project "dev1" on server "https://console.jkwong-ocp.internal-network.local:443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app centos/ruby-25-centos7~https://github.com/sclorg/ruby-ex.git
+
+to build a new example application in Ruby.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We initially gave access to both of these entities:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc adm policy add-role-to-group view dev1
+role "view" added: "dev1"
+$ oc adm policy add-role-to-user view user1
+role "view" added: "user1"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next we assigned the ICP role to give the same access that the user had in ICP.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc adm policy add-role-to-group icp:view dev1
+role "icp:view" added: "dev1"
+$ oc adm policy add-role-to-user icp:admin user1
+role "icp:admin" added: "user1"</pre>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
