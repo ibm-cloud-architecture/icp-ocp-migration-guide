@@ -1,0 +1,11 @@
+* xref:migration_strategy.adoc[Migration Strategy]
+* Migration
+** xref:migration/container_mod.adoc[Container modification]
+** xref:migration/container_scc.adoc[Security Context Constraints]
+** xref:migration/ldap_migration.adoc[LDAP migration]
+** xref:migration/rbac_migration.adoc[RBAC migration]
+** xref:migration/storage.adoc[Storage]
+** xref:migration/app_resource_migration.adoc[App resource migration]
+** xref:migration/cd_migration.adoc[GitOps Migration]
+** xref:migration/jenkins_migration.adoc[Jenkins server migration]
+* xref:key_differences.adoc[Key Differences]
