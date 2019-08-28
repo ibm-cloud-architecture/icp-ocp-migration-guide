@@ -3,12 +3,12 @@ runtime:
 
 site:
   title: Openshift Migration Guide
-  url: https://ibm-cloud-architecture.github.io/learning-cloudnative-101/
+  url: https://github.ibm.com/CASE/openshift-migration-guide
   start_page: Openshift Migration Guide::index.adoc
 
 content:
   sources:
-    - url: https://$GH_TOKEN@github.ibm.com/CASE/openshift-migration-guide.git
+    - url: https://${GH_USER}:${GH_TOKEN}@${GH_URL}/${GH_ORG}/${GH_REPO}.git
       branches: "master"
 ui:
   bundle:
