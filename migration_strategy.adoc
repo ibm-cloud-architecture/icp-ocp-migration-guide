@@ -71,7 +71,7 @@ ifdef::env-github[]
 
 endif::[]
 
-==== DevOps and Developer toolchains
+=== DevOps and Developer toolchains
 
 Generally, ICP was not opinionated on DevOps, and if the toolchain is outside of
 the platform there is no reason for this to change when migrating to Openshift.
@@ -83,87 +83,62 @@ scenario where we are migrating existing workload from ICP these are not
 required to change. We can simply treat Openshift as another Kubernetes platform
 we are deploying to.
 
-===== Jenkins server migration
+ifndef::env-github[]
+:leveloffset: +1
 
-One scenario that bears mentioning is if the CI toolchain was deployed to ICP,
-typically using the community Helm chart. For example, In the BlueCompute case,
-this was done using a containerized Jenkins instance. All of the stages in the
-pipelines run as containers in Kubernetes using the Kubernetes plugin.
+include::./migration/jenkins_migration.adoc[Jenkins Migration]
 
-https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes
+:leveloffset: 0 
 
-The best practice around Jenkins is for the pipelines themselves to be written
-using a declarative `+Jenkinsfile+` stored with the code. The pipeline logic is
-then treated as code and stored with the application source code. In
-BlueCompute, Jenkinsfiles are stored with each microservice, so we only needed
-to create an instance of Jenkins in Openshift.
+endif::[]
 
-Openshift has both ephemeral and persistent Jenkins in the catalog which is very
-comparable to the Jenkins Helm chart. This instance of Jenkins will
-automatically install the Kubernetes and Openshift client plugins, so
-Jenkinsfile that uses podTemplates that spin up containers to run stages in the
-pipeline should ``just work''.
+ifdef::env-github[]
 
-As pipeline stages are run in containers, there are security issues when a
-particular stage attempts to run a container that requires root access, mounts a
-hostpath, etc. Most runtime build images don’t run as root (e.g. maven, gradle,
-etc).
+* link:./migration/jenkins_migration.adoc[Jenkins Migration]
 
-One security problem when using Kubernetes plugin is how to build the container
-image itself, which must run in a container. In Openshift this is further
-complicated that the default `+restricted+` SCC disallows hostmounting the
-docker socket, running as root, or running in privileged mode without changing
-the SCC. The community is still attempting to resolve this problem, since
-traditionally the Docker tool requires root and many of the functions involved
-in building a container image requires various elevated privileges.
+endif::[]
 
-There are a few projects at various stages in development as of this writing
-that can build container images without docker, which run fine outside of a
-container, but none are perfect inside of a container.
+==== Continuous Deployment and GitOps adoption
 
-* https://github.com/GoogleContainerTools/kaniko[kaniko]
-* https://github.com/cyphar/orca-build[orca-build]
-* https://github.com/genuinetools/img[img]
-* https://github.com/uber/makisu[makisu]
-* https://github.com/containers/buildah[buildah]
+ifndef::env-github[]
+:leveloffset: +1
 
-When using these tools, we can relax the security on them by adding the SCC to
-the `+jenkins+` service account in the namespace where the pod runs. For
-example, kaniko requires `+root+` access, so we can simply add the `+anyuid+`
-scc to enable kaniko:
+include::./migration/cd_migration.adoc[CD Migration]
 
-....
-$ oc adm policy add-scc-to-user anyuid -z jenkins
-....
+:leveloffset: 0 
 
-Note the security implications of the above, that while containers are running
-with elevated privileges, that any other workload running on the same worker
-node may be vulnerable to attack. It may make sense to use a `+nodeSelector+` on
-all projects where jenkins will run to isolate jenkins workloads to just a few
-nodes:
-https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#setting-the-project-wide-node-selector
+endif::[]
 
-Alternatively, if we are running the Jenkins pipeline in Openshift, we can
-leverage the Openshift BuildConfig to build the container image, which provides
-a controlled environment for producing the container image without exposing
-`+root+` access on any worker nodes. By providing just a `+Dockerfile+` and a
-context, Openshift will build and push the resulting image to the Openshift
-private registry and track it using an ImageStream, and we can then provide an
-additional stage using https://github.com/containers/skopeo[skopeo] to push this
-to an external registry.
+ifdef::env-github[]
 
-We have posted an example pipeline we used at a customer that leverages this at
-the following git repository:
+* link:./migration/cd_migration.adoc[CD Migration]
 
-https://github.com/jkwong888/liberty-hello-world-openshift/blob/master/Jenkinsfile
+endif::[]
 
-===== Declarative deployment and GitOps adoption
+==== Migration of Kubernetes Artifacts
+jj
+ifndef::env-github[]
+:leveloffset: +1
+
+include::./migration/app_resource_migration.adoc[Application Resource Migration]
+
+:leveloffset: 0 
+
+endif::[]
+
+ifdef::env-github[]
+
+* link:./migration/app_resource_migration.adoc[Application Resource Migration]
+
+endif::[]
+
+
 
 ==== Using a Backup/Restore approach using Velero
 
 ==== Converting PodSecurityPolicy to SecurityContextConstraints
 
-==== Helm Charts
+==== NetworkPolicy migration
 
 ==== Application LoadBalancer cutover
 
@@ -174,7 +149,7 @@ ifndef::env-github[]
 
 include::./migration/storage.adoc[Storage Migration]
 
-:leveloffset:0 
+:leveloffset: 0 
 
 endif::[]
 
