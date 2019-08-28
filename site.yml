@@ -3,13 +3,11 @@ runtime:
 
 site:
   title: Openshift Migration Guide
-  url: https://github.ibm.com/CASE/openshift-migration-guide/
-  start_page: Openshift Migration Guide::index.adoc
 
 content:
   sources:
-    - url: https://github.ibm.com/CASE/openshift-migration-guide.git
-      branches: "master"
+    - url: .
+      branches: HEAD
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
