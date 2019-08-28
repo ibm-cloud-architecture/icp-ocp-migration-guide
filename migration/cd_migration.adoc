@@ -1,0 +1,156 @@
+==== GitOps Migration
+
+In some of our previous CICD examples, we tightly coupled Continuous Integration (CI) with Continuous Deployment (CD) in a single pipeline.
+This makes it difficult for deployments to become portable as the build is highly dependent on the deployment target.
+
+The community has been moving toward declarative deployment and some terms like link:https://www.weave.works/technologies/gitops/[GitOps] have been gaining popularity.
+In this model, CI performs pre-release verification with build and test of the application. 
+The output of CI is the "document" that describes what to deploy, which in Kubernetes includes the container image, and the associated resource yamls that can also be packaged into Helm charts or kustomize applcations.
+We leave the "how" and "where" to deploy to CD.
+In some organizations these are separate (sometimes siloed) organizations, so the "document" approach allows a better separation of concerns.
+
+In true GitOps, all operations have a matching action in git (pull requests, merges, etc).
+Deployment documents are committed to a git repo, which can trigger webhooks to begin the CD process.
+Code promotion involves merges to git repos representing the desired state of upper environments.
+The git commit log could be used for approval and deployment history but probably shouldn't be used for audit (as git history can be manipulated).
+
+We have posted a sample CI pipeline where we decoupled the CI from the CD. (link to be provided)
+
+As there is no upgrade path from Openshift 3.x to Openshift 4.x, separating CI from CD and adopting GitOps will allow you to add a new Openshift 4.x environment as an additional deployment target with minimal effort.
+Having a single repository representing a deployment to a target environment also allows us to scale out to additional target environments as application adoption requires it.
+
+==== Decoupling CD from CI
+
+As CI is common to both ICP and Openshift platforms, when we move to a declarative deployment model, the CD is the only part that changes.  
+A first step toward GitOps and declarative deployments is to decouple CD from CI.
+
+In our Bluecompute case study, we had tightly coupled CI/CD pipelines and broke it into two, CI, and CD (to dev).
+The end of our CI process generates an image, and embeds the URL into Kubernetes yamls and pushes it to a second Git repository representing a deployment.
+The CD pipeline is triggered from changes to the deployment git repository, which executes a deployment script (in jenkins) into the target environments.
+Generally we can expect one target environment type (e.g. dev, qa, stage, prod)per git repository, and one pipeline per environment (e.g. prod-east, prod-west).
+It's important to be as declarative as possible.
+
+There are a few projects, including link:https://razee.io[Razee] (included with Cloud Pak for Applications), that can monitor and perform deployments from git repositories.  
+Ideally, the deployment is performed from inside the target environment to reduce the number of credentials being stored in the deployment system.
+When these projects mature, we can migrate to them.
+For now, we used our existing Jenkins server to monitor and perform the deployment.
+
+==== Using a service account from outside of the platform to perform deployment
+
+Openshift ships with a service account in each project `deployer`, and a  cluster role `system:deployer` which contains some permissions it uses internally to perform `DeploymentConfig` rollouts.
+As we are not using `DeploymentConfig`, this was not enough for our CD process, since all of the permissions are against the built-in Openshift resources.
+
+In some of our client engagements, the CD process performs a deployment using a service account that has limited privileges.
+For our Bluecompute case study, we created a `jenkins` service account that performs the deployment in the target namespace.
+
+....
+oc create serviceaccount jenkins -n bluecompute
+....
+
+We created the following `deployer` clusterrole that allows a CD tool to do its job on generic Kubernetes resources:
+
+....
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    openshift.io/description: Grants the right to deploy within a project.  Used primarily
+      with service accounts for automated deployments.
+    openshift.io/reconcile-protect: "false"
+  name: deployer
+rules:
+- apiGroups:
+  - extensions
+  attributeRestrictions: null
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - ingresses
+  - networkpolicies
+  - replicasets
+  - replicasets/scale
+  - replicationcontrollers/scale
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+....
+
+Then we apply this new role and also the `view` role to the `jenkins` service account so it can see the project.
+
+....
+oc adm policy add-role-to-user view system:serviceaccounts:bluecompute:jenkins
+oc adm policy add-role-to-user deployer system:serviceaccounts:bluecompute:jenkins
+....
+
+We can also generate the `kubeconfig.yaml` needed for our CD tool to connect to the cluster.
+First, find the serviceaccount token:
+
+....
+oc describe serviceaccount jenkins
+Name:                jenkins
+Namespace:           bluecompute
+Labels:              <none>
+Annotations:         <none>
+Image pull secrets:  jenkins-dockercfg-gmhlq
+Mountable secrets:   jenkins-token-r4rcs
+                     jenkins-dockercfg-gmhlq
+Tokens:              jenkins-token-b7lvw
+                     jenkins-token-r4rcs
+Events:              <none>
+....
+
+Get the token from the secret, which looks like a JWT.
+
+....
+oc describe secret jenkins-token-b7lvw
+Name:         jenkins-token-b7lvw
+Namespace:    bluecompute
+Labels:       <none>
+Annotations:  kubernetes.io/created-by=openshift.io/create-dockercfg-secrets
+              kubernetes.io/service-account.name=jenkins
+              kubernetes.io/service-account.uid=64aed8e2-c900-11e9-b106-005056a86156
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:          1070 bytes
+namespace:       11 bytes
+service-ca.crt:  2186 bytes
+token:           eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...
+....
+
+Create a new kubeconfig yaml and log in to openshift using the token:
+
+....
+export KUBECONFIG=/tmp/jenkins-kubeconfig.yaml
+oc login <openshift URL> --token=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...
+....
+
+The file `/tmp/jenkins-kubeconfig.yaml` now contains the configuration including embedded credentials for connecting to Openshift as the service account.  
+Use caution when distributing this file as the token does not expire.
+In our Bluecompute case study, we stored this as a "Secret file" credential in Jenkins.
+You can invoke the API, for example to patch a deployment, using:
+
+....
+kubectl --kubeconfig=<mykubeconfig> apply -f deployment.yaml
+....
+
+
+==== Performing deployments from inside the platform
+
+As the number of environments increases, it can become difficult to manage credentials for each environments, particular if they are dynamically created using Terraform, Cluster API, or some other infrastructure automation.
+One interesting model is to run a controller or operator from inside each cluster that is created and have it monitor the git repository to perform deployments.
+link:https://razee.io[Razee] is one such project, but there are others, including link:https://argoproj.github.io/argo-cd/[ArgoCD].
+Another approach is to just run a simple link:https://tekton.dev[Tekton] pipeline that monitors git repository changes and executes the deployment as the service account from within the cluster.
+This way the credentials do not need to be extracted from each cluster as it is created and managed individually.
+
+We will publish an example of this (link to be provided).
