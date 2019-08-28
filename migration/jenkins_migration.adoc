@@ -8,7 +8,7 @@ pipelines run as containers in Kubernetes using the Kubernetes plugin.
 https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes
 
 The best practice around Jenkins is for the pipelines themselves to be written using a declarative `+Jenkinsfile+` stored with the code. 
-The pipeline logic is then treated as code and stored with the application source code. 
+The pipeline logic is stored with the application source code and itself treated as part of the application. 
 In BlueCompute, Jenkinsfiles are stored with each microservice, so we only needed to create an instance of Jenkins in Openshift and import the pipelines to get our builds to work.
 
 Openshift has both ephemeral and persistent Jenkins in the catalog which is very comparable to the Jenkins Helm chart. 

@@ -116,7 +116,7 @@ ifdef::env-github[]
 endif::[]
 
 ==== Migration of Kubernetes Artifacts
-jj
+
 ifndef::env-github[]
 :leveloffset: +1
 
@@ -131,8 +131,6 @@ ifdef::env-github[]
 * link:./migration/app_resource_migration.adoc[Application Resource Migration]
 
 endif::[]
-
-
 
 ==== Using a Backup/Restore approach using Velero
 

@@ -9,7 +9,7 @@ include::./migration_strategy.adoc[migration strategy]
 endif::[]
 
 ifdef::env-github[]
-* link:./key_differences.adoc[Key differences between Openshift and ICPk]
+* link:./key_differences.adoc[Key differences between Openshift and ICP]
 * link:./migration_strategy.adoc[Migration strategy]
 endif::[]
 
