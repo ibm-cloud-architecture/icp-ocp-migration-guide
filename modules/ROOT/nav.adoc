@@ -2,9 +2,9 @@
 * Migration
 ** xref:migration/container_mod.adoc[Container modification]
 ** xref:migration/container_scc.adoc[Security Context Constraints]
-** xref:migration/ldap_migration.adoc[LDAP migration]
-** xref:migration/rbac_migration.adoc[RBAC migration]
-** xref:migration/storage.adoc[Storage]
+** xref:migration/ldap_migration.adoc[User Authentication migration – LDAP]
+** xref:migration/rbac_migration.adoc[User Authorization Migration - RBAC]
+** xref:migration/storage.adoc[Storage migration]
 ** xref:migration/app_resource_migration.adoc[App resource migration]
 ** xref:migration/cd_migration.adoc[GitOps Migration]
 ** xref:migration/jenkins_migration.adoc[Jenkins server migration]
