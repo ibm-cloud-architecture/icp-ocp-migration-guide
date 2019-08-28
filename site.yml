@@ -3,6 +3,8 @@ runtime:
 
 site:
   title: Openshift Migration Guide
+  url: https://github.ibm.com/CASE/openshift-migration-guide/
+  start_page: Openshift Migration Guide::index.adoc
 
 content:
   sources:
