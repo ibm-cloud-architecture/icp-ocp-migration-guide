@@ -1,0 +1,18 @@
+runtime:
+  cache_dir: ./.cache/antora
+
+site:
+  title: Openshift Migration Guide
+  url: https://github.ibm.com/CASE/openshift-migration-guide
+  start_page: Openshift Migration Guide::index.adoc
+
+content:
+  sources:
+    - url: https://$GH_TOKEN@github.ibm.com/CASE/openshift-migration-guide.git
+      branches: "master"
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
+  supplemental_files: ./supplemental-ui
+output:
+  dir: ./gh-pages
