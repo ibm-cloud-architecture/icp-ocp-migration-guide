@@ -4,7 +4,7 @@ In some of our previous CICD examples, we tightly coupled Continuous Integration
 This makes it difficult for deployments to become portable as the build is highly dependent on the deployment target.
 
 The community has been moving toward declarative deployment and some terms like link:https://www.weave.works/technologies/gitops/[GitOps] have been gaining popularity.
-In this model, CI performs pre-release verification with build and test of the application. 
+In this model, CI performs pre-release verification with build and test of the application.
 The output of CI is the "document" that describes what to deploy, which in Kubernetes includes the container image, and the associated resource yamls that can also be packaged into Helm charts or kustomize applcations.
 We leave the "how" and "where" to deploy to CD.
 In some organizations these are separate (sometimes siloed) organizations, so the "document" approach allows a better separation of concerns.
@@ -21,7 +21,7 @@ Having a single repository representing a deployment to a target environment als
 
 ==== Decoupling CD from CI
 
-As CI is common to both ICP and Openshift platforms, when we move to a declarative deployment model, the CD is the only part that changes.  
+As CI is common to both ICP and Openshift platforms, when we move to a declarative deployment model, the CD is the only part that changes.
 A first step toward GitOps and declarative deployments is to decouple CD from CI.
 
 In our Bluecompute case study, we had tightly coupled CI/CD pipelines and broke it into two, CI, and CD (to dev).
@@ -30,7 +30,7 @@ The CD pipeline is triggered from changes to the deployment git repository, whic
 Generally we can expect one target environment type (e.g. dev, qa, stage, prod)per git repository, and one pipeline per environment (e.g. prod-east, prod-west).
 It's important to be as declarative as possible.
 
-There are a few projects, including link:https://razee.io[Razee] (included with Cloud Pak for Applications), that can monitor and perform deployments from git repositories.  
+There are a few projects, including link:https://razee.io[Razee] (included with Cloud Pak for Applications), that can monitor and perform deployments from git repositories.
 Ideally, the deployment is performed from inside the target environment to reduce the number of credentials being stored in the deployment system.
 When these projects mature, we can migrate to them.
 For now, we used our existing Jenkins server to monitor and perform the deployment.
@@ -128,14 +128,14 @@ service-ca.crt:  2186 bytes
 token:           eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...
 ....
 
-Create a new kubeconfig yaml and log in to openshift using the token:
+Create a new kubeconfig yaml and log in to Openshift using the token:
 
 ....
 export KUBECONFIG=/tmp/jenkins-kubeconfig.yaml
 oc login <openshift URL> --token=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...
 ....
 
-The file `/tmp/jenkins-kubeconfig.yaml` now contains the configuration including embedded credentials for connecting to Openshift as the service account.  
+The file `/tmp/jenkins-kubeconfig.yaml` now contains the configuration including embedded credentials for connecting to Openshift as the service account.
 Use caution when distributing this file as the token does not expire.
 In our Bluecompute case study, we stored this as a "Secret file" credential in Jenkins.
 You can invoke the API, for example to patch a deployment, using:

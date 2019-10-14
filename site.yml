@@ -8,8 +8,8 @@ site:
 
 content:
   sources:
-    - url: https://$GH_TOKEN@github.ibm.com/CASE/openshift-migration-guide.git
-      branches: "master"
+    - url: .
+      branches: master
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
