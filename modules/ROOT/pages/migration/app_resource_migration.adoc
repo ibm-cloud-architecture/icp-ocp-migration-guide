@@ -6,12 +6,12 @@ As Openshift supports these same Kubernetes-native objects, the least effort in 
 
 ==== Routes vs Ingress
 
-Openshift also has the concept of `Route` instead of `Ingress`, which predates the first-class `Ingress` object.  
-Openshift will automatically convert `Ingress` resources to a `Route` and exposes them through the router.  
+Openshift also has the concept of `Route` instead of `Ingress`, which predates the first-class `Ingress` object.
+Openshift will automatically convert `Ingress` resources to a `Route` and exposes them through the router.
 See here for more information:
 https://blog.openshift.com/kubernetes-ingress-vs-openshift-route/
 
-As the implementation of how ingress resources are exposed are dependent on the ingress controller type, there are some features that are not available in Openshift routes. 
+As the implementation of how ingress resources are exposed are dependent on the ingress controller type, there are some features that are not available in Openshift routes.
 One popular example is path-rewrites supported by annotations, which were performed by the nginx ingress controller in ICP.
 A mitigation to this is to add the nginx ingress controller between the router and services in Openshift that monitors a specific ingress class, and expose the nginx ingress controller through a route.
 
@@ -21,7 +21,7 @@ Some development organizations may have adopted use of Helm Charts as a packagin
 As has been discussed frequently, Openshift does not natively support Helm chart based deployment.
 This is because it is difficult to configure the server-side component (Tiller) in a secure manner.
 Helm does have some advantages, such as a robust templating language, versioning, and package dependency management.
-A lot of community software is already packaged as Helm charts, although many of them do not work out of the box due in Openshift to problems with `SecurityContextConstraints` (discussed earlier).
+A lot of community software is already packaged as Helm charts, although many of them do not work out of the box in Openshift due to the problems with `SecurityContextConstraints` (discussed earlier).
 
 If Helm charts are already used for package distribution in your application, we can continue to package applications using them as part of the deployment artifacts.
 The deployment artifact in this case becomes the Helm chart in addition to generating the deployment values (i.e. `values.yaml`).
@@ -34,4 +34,3 @@ https://helm.sh/blog/helm-v3-beta/
 
 In the near term, Cloud Paks are distributed as Helm charts and the ICP common services layer will include server side tiller.
 However it is not recommended to depend on this for application deployment as Cloud Pak will be moving away from server-side Tiller and into an Operator model.
-
