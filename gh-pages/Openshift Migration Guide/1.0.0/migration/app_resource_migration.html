@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <link rel="canonical" href="https://github.ibm.com/CASE/openshift-migration-guide/Openshift%20Migration%20Guide/1.0.0/migration/app_resource_migration.html">
+    <meta name="generator" content="Antora 2.1.2">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ldap_migration.html">User Authentication Migration (LDAP)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="rbac_migration.html">User Authorization Migration (RBAC)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="storage.html">Storage Migration</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="app_resource_migration.html">App resource Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jenkins_migration.html">Jenkins server Migration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main>
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Openshift Migration Guide</a></li>
+    <li>Migration</li>
+    <li><a href="app_resource_migration.html">App resource Migration</a></li>
+  </ul>
+</nav>
+</div>
+<article class="doc">
+<div class="sect3">
+<h4 id="_deploymentconfig_vs_deployment"><a class="anchor" href="#_deploymentconfig_vs_deployment"></a>DeploymentConfig vs Deployment</h4>
+<div class="paragraph">
+<p>Openshift has its own deployment resources called <code>DeploymentConfig</code> and <code>ReplicationController</code>.
+These pre-date the <code>Deployment</code> concept in Kubernetes and provide some additional functionality such as the ability to trigger deployments from upstream image changes.
+As Openshift supports these same Kubernetes-native objects, the least effort in a migration is to reuse the resources used to deploy to ICP.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_routes_vs_ingress"><a class="anchor" href="#_routes_vs_ingress"></a>Routes vs Ingress</h4>
+<div class="paragraph">
+<p>Openshift also has the concept of <code>Route</code> instead of <code>Ingress</code>, which predates the first-class <code>Ingress</code> object.
+Openshift will automatically convert <code>Ingress</code> resources to a <code>Route</code> and exposes them through the router.
+See here for more information:
+<a href="https://blog.openshift.com/kubernetes-ingress-vs-openshift-route/" class="bare">https://blog.openshift.com/kubernetes-ingress-vs-openshift-route/</a></p>
+</div>
+<div class="paragraph">
+<p>As the implementation of how ingress resources are exposed are dependent on the ingress controller type, there are some features that are not available in Openshift routes.
+One popular example is path-rewrites supported by annotations, which were performed by the nginx ingress controller in ICP.
+A mitigation to this is to add the nginx ingress controller between the router and services in Openshift that monitors a specific ingress class, and expose the nginx ingress controller through a route.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_helm_charts"><a class="anchor" href="#_helm_charts"></a>Helm Charts</h4>
+<div class="paragraph">
+<p>Some development organizations may have adopted use of Helm Charts as a packaging mechanism for Kubernetes resources.
+As has been discussed frequently, Openshift does not natively support Helm chart based deployment.
+This is because it is difficult to configure the server-side component (Tiller) in a secure manner.
+Helm does have some advantages, such as a robust templating language, versioning, and package dependency management.
+A lot of community software is already packaged as Helm charts, although many of them do not work out of the box due in Openshift to problems with <code>SecurityContextConstraints</code> (discussed earlier).</p>
+</div>
+<div class="paragraph">
+<p>If Helm charts are already used for package distribution in your application, we can continue to package applications using them as part of the deployment artifacts.
+The deployment artifact in this case becomes the Helm chart in addition to generating the deployment values (i.e. <code>values.yaml</code>).
+The deployment procedure involves rendering the template locally into raw Kubernetes yamls (<code>helm template</code>), then deploying them using the <code>kubectl</code> or <code>oc</code> CLI into the target cluster.
+We have documented the approach here:
+<a href="https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/spring/docs/openshift/README.md" class="bare">https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/spring/docs/openshift/README.md</a></p>
+</div>
+<div class="paragraph">
+<p>Helm v3, which is currently in beta, is also a possibility for client-side rendering, as tiller is embedded into the helm client and there is no server-side component.  See the recent announcement about the beta as well as the related documentation:
+<a href="https://helm.sh/blog/helm-v3-beta/" class="bare">https://helm.sh/blog/helm-v3-beta/</a></p>
+</div>
+<div class="paragraph">
+<p>In the near term, Cloud Paks are distributed as Helm charts and the ICP common services layer will include server side tiller.
+However it is not recommended to depend on this for application deployment as Cloud Pak will be moving away from server-side Tiller and into an Operator model.</p>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

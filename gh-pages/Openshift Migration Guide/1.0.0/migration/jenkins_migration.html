@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <link rel="canonical" href="https://github.ibm.com/CASE/openshift-migration-guide/Openshift%20Migration%20Guide/1.0.0/migration/jenkins_migration.html">
+    <meta name="generator" content="Antora 2.1.2">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ldap_migration.html">User Authentication Migration (LDAP)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="rbac_migration.html">User Authorization Migration (RBAC)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="storage.html">Storage Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="app_resource_migration.html">App resource Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="jenkins_migration.html">Jenkins server Migration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main>
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Openshift Migration Guide</a></li>
+    <li>Migration</li>
+    <li><a href="jenkins_migration.html">Jenkins server Migration</a></li>
+  </ul>
+</nav>
+</div>
+<article class="doc">
+<div class="sect2">
+<h3 id="_jenkins_server_migration"><a class="anchor" href="#_jenkins_server_migration"></a>Jenkins server migration</h3>
+<div class="paragraph">
+<p>One scenario that bears mentioning is if the CI toolchain was deployed to ICP,
+typically using the community Helm chart. For example, In the BlueCompute case,
+this was done using a containerized Jenkins instance. All of the stages in the
+pipelines run as containers in Kubernetes using the Kubernetes plugin.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes" class="bare">https://github.com/ibm-cloud-architecture/refarch-cloudnative-devops-kubernetes</a></p>
+</div>
+<div class="paragraph">
+<p>The best practice around Jenkins is for the pipelines themselves to be written using a declarative <code>Jenkinsfile</code> stored with the code.
+The pipeline logic is stored with the application source code and itself treated as part of the application.
+In BlueCompute, Jenkinsfiles are stored with each microservice, so we only needed to create an instance of Jenkins in Openshift and import the pipelines to get our builds to work.</p>
+</div>
+<div class="paragraph">
+<p>Openshift has both ephemeral and persistent Jenkins in the catalog which is very comparable to the Jenkins Helm chart.
+This instance of Jenkins will automatically install the Kubernetes and Openshift client plugins, so Jenkinsfile that uses podTemplates that spin up containers to run stages in the pipeline should "just work".</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_running_jenkins_pipeline_stages_as_containers_in_openshift"><a class="anchor" href="#_running_jenkins_pipeline_stages_as_containers_in_openshift"></a>Running Jenkins pipeline stages as containers in Openshift</h3>
+<div class="paragraph">
+<p>As pipeline stages are run in containers, there are security issues when a particular stage attempts to run a container that requires root access, mounts a hostpath, etc, just like application containers.
+Most runtime build images don’t need to run as root (e.g. maven, gradle, etc), which means they should run just fine in Openshift.</p>
+</div>
+<div class="paragraph">
+<p>One security problem when using Kubernetes plugin is how to build the container image itself, which must run in a container.
+In Openshift this is further complicated that the default <code>restricted</code> SCC disallows host mounting the docker socket, running as root, or running in privileged mode without changing the SCC.
+The community is still attempting to resolve this problem, since traditionally the Docker tool requires root and many of the functions involved in building a container image requires various elevated privileges.</p>
+</div>
+<div class="paragraph">
+<p>There are a few projects at various stages in development as of this writing that can build container images without docker, which run fine outside of a container, but none are perfect inside of a container.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/GoogleContainerTools/kaniko">kaniko</a></p>
+</li>
+<li>
+<p><a href="https://github.com/cyphar/orca-build">orca-build</a></p>
+</li>
+<li>
+<p><a href="https://github.com/genuinetools/img">img</a></p>
+</li>
+<li>
+<p><a href="https://github.com/uber/makisu">makisu</a></p>
+</li>
+<li>
+<p><a href="https://github.com/containers/buildah">buildah</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When using these tools, we can relax the security constraints on them by adding the SCC to the <code>jenkins</code> service account in the namespace where the pod runs.
+For example, kaniko only requires <code>root</code> access, so we can simply add the <code>anyuid</code>
+scc to enable kaniko:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>$ oc adm policy add-scc-to-user anyuid -z jenkins</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note the security implications of the above.
+While containers are running with elevated privileges, any other workload running on the same worker node may be vulnerable, as Jenkins build stages may run as root.
+Additionally since the developer controls the commands used in the pipeline stage, this essentially gives developers root access on the worker node the build runs on.
+In shared clusters, it may make sense to use a <code>nodeSelector</code> on all projects where jenkins will run to isolate jenkins workloads to just a few nodes: <a href="https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#setting-the-project-wide-node-selector" class="bare">https://docs.openshift.com/container-platform/3.11/admin_guide/managing_projects.html#setting-the-project-wide-node-selector</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_migration_of_container_builds_to_openshift_buildconfigs"><a class="anchor" href="#_migration_of_container_builds_to_openshift_buildconfigs"></a>Migration of Container builds to Openshift BuildConfigs</h3>
+<div class="paragraph">
+<p>If we are running the Jenkins pipeline stages in Jenkins on Openshift, we can leverage the <a href="https://github.com/openshift/jenkins-client-plugin">Openshift Jenkins client plugin</a> and the <a href="https://docs.openshift.com/container-platform/3.11/dev_guide/builds/index.html#defining-a-buildconfig">Openshift BuildConfig</a> to build the container image, which provides a controlled environment for producing the container image without exposing <code>root</code> access on any worker nodes.
+By providing just a <code>Dockerfile</code> and a build context, Openshift will build and push the resulting image to the Openshift private registry and track it using an ImageStream, and we can then provide an
+additional stage using <a href="https://github.com/containers/skopeo">skopeo</a> to push this to an external registry.
+BuildConfig limits the amount of damage the developer can do because they are not explicitly running commands as root.</p>
+</div>
+<div class="paragraph">
+<p>We have posted an example pipeline we used at a customer that leverages this at the following git repository:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/jkwong888/liberty-hello-world-openshift/blob/master/Jenkinsfile" class="bare">https://github.com/jkwong888/liberty-hello-world-openshift/blob/master/Jenkinsfile</a></p>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

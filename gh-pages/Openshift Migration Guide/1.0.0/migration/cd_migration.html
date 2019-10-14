@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <link rel="canonical" href="https://github.ibm.com/CASE/openshift-migration-guide/Openshift%20Migration%20Guide/1.0.0/migration/cd_migration.html">
+    <meta name="generator" content="Antora 2.1.2">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ldap_migration.html">User Authentication Migration (LDAP)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="rbac_migration.html">User Authorization Migration (RBAC)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="storage.html">Storage Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="app_resource_migration.html">App resource Migration</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jenkins_migration.html">Jenkins server Migration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main>
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Openshift Migration Guide</a></li>
+    <li>Migration</li>
+    <li><a href="cd_migration.html">GitOps Migration</a></li>
+  </ul>
+</nav>
+</div>
+<article class="doc">
+<div class="sect3">
+<h4 id="_gitops_migration"><a class="anchor" href="#_gitops_migration"></a>GitOps Migration</h4>
+<div class="paragraph">
+<p>In some of our previous CICD examples, we tightly coupled Continuous Integration (CI) with Continuous Deployment (CD) in a single pipeline.
+This makes it difficult for deployments to become portable as the build is highly dependent on the deployment target.</p>
+</div>
+<div class="paragraph">
+<p>The community has been moving toward declarative deployment and some terms like <a href="https://www.weave.works/technologies/gitops/">GitOps</a> have been gaining popularity.
+In this model, CI performs pre-release verification with build and test of the application.
+The output of CI is the "document" that describes what to deploy, which in Kubernetes includes the container image, and the associated resource yamls that can also be packaged into Helm charts or kustomize applcations.
+We leave the "how" and "where" to deploy to CD.
+In some organizations these are separate (sometimes siloed) organizations, so the "document" approach allows a better separation of concerns.</p>
+</div>
+<div class="paragraph">
+<p>In true GitOps, all operations have a matching action in git (pull requests, merges, etc).
+Deployment documents are committed to a git repo, which can trigger webhooks to begin the CD process.
+Code promotion involves merges to git repos representing the desired state of upper environments.
+The git commit log could be used for approval and deployment history but probably shouldn&#8217;t be used for audit (as git history can be manipulated).</p>
+</div>
+<div class="paragraph">
+<p>We have posted a sample CI pipeline where we decoupled the CI from the CD. (link to be provided)</p>
+</div>
+<div class="paragraph">
+<p>As there is no upgrade path from Openshift 3.x to Openshift 4.x, separating CI from CD and adopting GitOps will allow you to add a new Openshift 4.x environment as an additional deployment target with minimal effort.
+Having a single repository representing a deployment to a target environment also allows us to scale out to additional target environments as application adoption requires it.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_decoupling_cd_from_ci"><a class="anchor" href="#_decoupling_cd_from_ci"></a>Decoupling CD from CI</h4>
+<div class="paragraph">
+<p>As CI is common to both ICP and Openshift platforms, when we move to a declarative deployment model, the CD is the only part that changes.
+A first step toward GitOps and declarative deployments is to decouple CD from CI.</p>
+</div>
+<div class="paragraph">
+<p>In our Bluecompute case study, we had tightly coupled CI/CD pipelines and broke it into two, CI, and CD (to dev).
+The end of our CI process generates an image, and embeds the URL into Kubernetes yamls and pushes it to a second Git repository representing a deployment.
+The CD pipeline is triggered from changes to the deployment git repository, which executes a deployment script (in jenkins) into the target environments.
+Generally we can expect one target environment type (e.g. dev, qa, stage, prod)per git repository, and one pipeline per environment (e.g. prod-east, prod-west).
+It&#8217;s important to be as declarative as possible.</p>
+</div>
+<div class="paragraph">
+<p>There are a few projects, including <a href="https://razee.io">Razee</a> (included with Cloud Pak for Applications), that can monitor and perform deployments from git repositories.
+Ideally, the deployment is performed from inside the target environment to reduce the number of credentials being stored in the deployment system.
+When these projects mature, we can migrate to them.
+For now, we used our existing Jenkins server to monitor and perform the deployment.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_a_service_account_from_outside_of_the_platform_to_perform_deployment"><a class="anchor" href="#_using_a_service_account_from_outside_of_the_platform_to_perform_deployment"></a>Using a service account from outside of the platform to perform deployment</h4>
+<div class="paragraph">
+<p>Openshift ships with a service account in each project <code>deployer</code>, and a  cluster role <code>system:deployer</code> which contains some permissions it uses internally to perform <code>DeploymentConfig</code> rollouts.
+As we are not using <code>DeploymentConfig</code>, this was not enough for our CD process, since all of the permissions are against the built-in Openshift resources.</p>
+</div>
+<div class="paragraph">
+<p>In some of our client engagements, the CD process performs a deployment using a service account that has limited privileges.
+For our Bluecompute case study, we created a <code>jenkins</code> service account that performs the deployment in the target namespace.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc create serviceaccount jenkins -n bluecompute</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We created the following <code>deployer</code> clusterrole that allows a CD tool to do its job on generic Kubernetes resources:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    openshift.io/description: Grants the right to deploy within a project.  Used primarily
+      with service accounts for automated deployments.
+    openshift.io/reconcile-protect: "false"
+  name: deployer
+rules:
+- apiGroups:
+  - extensions
+  attributeRestrictions: null
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/rollback
+  - deployments/scale
+  - ingresses
+  - networkpolicies
+  - replicasets
+  - replicasets/scale
+  - replicationcontrollers/scale
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we apply this new role and also the <code>view</code> role to the <code>jenkins</code> service account so it can see the project.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc adm policy add-role-to-user view system:serviceaccounts:bluecompute:jenkins
+oc adm policy add-role-to-user deployer system:serviceaccounts:bluecompute:jenkins</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can also generate the <code>kubeconfig.yaml</code> needed for our CD tool to connect to the cluster.
+First, find the serviceaccount token:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc describe serviceaccount jenkins
+Name:                jenkins
+Namespace:           bluecompute
+Labels:              &lt;none&gt;
+Annotations:         &lt;none&gt;
+Image pull secrets:  jenkins-dockercfg-gmhlq
+Mountable secrets:   jenkins-token-r4rcs
+                     jenkins-dockercfg-gmhlq
+Tokens:              jenkins-token-b7lvw
+                     jenkins-token-r4rcs
+Events:              &lt;none&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Get the token from the secret, which looks like a JWT.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>oc describe secret jenkins-token-b7lvw
+Name:         jenkins-token-b7lvw
+Namespace:    bluecompute
+Labels:       &lt;none&gt;
+Annotations:  kubernetes.io/created-by=openshift.io/create-dockercfg-secrets
+              kubernetes.io/service-account.name=jenkins
+              kubernetes.io/service-account.uid=64aed8e2-c900-11e9-b106-005056a86156
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:          1070 bytes
+namespace:       11 bytes
+service-ca.crt:  2186 bytes
+token:           eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a new kubeconfig yaml and log in to openshift using the token:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>export KUBECONFIG=/tmp/jenkins-kubeconfig.yaml
+oc login &lt;openshift URL&gt; --token=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The file <code>/tmp/jenkins-kubeconfig.yaml</code> now contains the configuration including embedded credentials for connecting to Openshift as the service account.
+Use caution when distributing this file as the token does not expire.
+In our Bluecompute case study, we stored this as a "Secret file" credential in Jenkins.
+You can invoke the API, for example to patch a deployment, using:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>kubectl --kubeconfig=&lt;mykubeconfig&gt; apply -f deployment.yaml</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_performing_deployments_from_inside_the_platform"><a class="anchor" href="#_performing_deployments_from_inside_the_platform"></a>Performing deployments from inside the platform</h4>
+<div class="paragraph">
+<p>As the number of environments increases, it can become difficult to manage credentials for each environments, particular if they are dynamically created using Terraform, Cluster API, or some other infrastructure automation.
+One interesting model is to run a controller or operator from inside each cluster that is created and have it monitor the git repository to perform deployments.
+<a href="https://razee.io">Razee</a> is one such project, but there are others, including <a href="https://argoproj.github.io/argo-cd/">ArgoCD</a>.
+Another approach is to just run a simple <a href="https://tekton.dev">Tekton</a> pipeline that monitors git repository changes and executes the deployment as the service account from within the cluster.
+This way the credentials do not need to be extracted from each cluster as it is created and managed individually.</p>
+</div>
+<div class="paragraph">
+<p>We will publish an example of this (link to be provided).</p>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

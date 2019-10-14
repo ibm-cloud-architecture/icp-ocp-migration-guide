@@ -8,7 +8,7 @@ site:
 
 content:
   sources:
-    - url: https://github.ibm.com/CASE/openshift-migration-guide
+    - url: https://$GH_TOKEN:@github.ibm.com/CASE/openshift-migration-guide
       branches: master
 ui:
   bundle:
