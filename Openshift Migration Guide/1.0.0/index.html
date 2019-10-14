@@ -83,7 +83,7 @@
     </div>
   </aside>
 </div>
-<main role="main">
+<main>
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
@@ -2372,7 +2372,7 @@ Most runtime build images don’t need to run as root (e.g. maven, gradle, etc)
 </div>
 <div class="paragraph">
 <p>One security problem when using Kubernetes plugin is how to build the container image itself, which must run in a container.
-In Openshift this is further complicated that the default <code>restricted</code> SCC disallows hostmounting the docker socket, running as root, or running in privileged mode without changing the SCC.
+In Openshift this is further complicated that the default <code>restricted</code> SCC disallows host mounting the docker socket, running as root, or running in privileged mode without changing the SCC.
 The community is still attempting to resolve this problem, since traditionally the Docker tool requires root and many of the functions involved in building a container image requires various elevated privileges.</p>
 </div>
 <div class="paragraph">
@@ -2583,7 +2583,7 @@ token:           eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJ...</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Create a new kubeconfig yaml and log in to openshift using the token:</p>
+<p>Create a new kubeconfig yaml and log in to Openshift using the token:</p>
 </div>
 <div class="literalblock">
 <div class="content">
