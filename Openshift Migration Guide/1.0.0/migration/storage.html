@@ -95,6 +95,7 @@
     <li><a href="storage.html">Storage Migration</a></li>
   </ul>
 </nav>
+  <div class="edit-this-page"><a href="file:///antora/modules/ROOT/pages/migration/storage.adoc">Edit this Page</a></div>
 </div>
 <article class="doc">
 <div class="sect2">
@@ -136,21 +137,21 @@ storage provider.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>Red Hat OpenShift support both GluserFS and Ceph as in-cluster storage
+<p>Red Hat Openshift support both GluserFS and Ceph as in-cluster storage
 providers. Haven’t heard the official support for Minio.</p>
 </div>
 <div class="paragraph">
 <p>There is no migration path or tools available to migrate ICP storage nodes to
-OpenShift. So, it boils down to handle the migration from the storage consumer’s
+Openshift. So, it boils down to handle the migration from the storage consumer’s
 aspect.</p>
 </div>
 <div class="paragraph">
 <p>If you are using external storage provider, as far as it is supported by
-OpenShift (all do except Minio), you just need to migrate the storage consumer
+Openshift (all do except Minio), you just need to migrate the storage consumer
 and leave the external storage provider as-is.</p>
 </div>
 <div class="paragraph">
-<p>If you are using internal storage provider, you need to setup the OpenShift
+<p>If you are using internal storage provider, you need to setup the Openshift
 Storage nodes, either GlusterFS or Ceph, using the same/similar spec as in ICP
 in terms of disk size, storage type, number of nodes. Then, proceed to storage
 consumer migration.</p>

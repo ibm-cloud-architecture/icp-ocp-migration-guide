@@ -95,6 +95,7 @@
     <li><a href="app_resource_migration.html">App resource Migration</a></li>
   </ul>
 </nav>
+  <div class="edit-this-page"><a href="file:///antora/modules/ROOT/pages/migration/app_resource_migration.adoc">Edit this Page</a></div>
 </div>
 <article class="doc">
 <div class="sect3">
@@ -126,7 +127,7 @@ A mitigation to this is to add the nginx ingress controller between the router a
 As has been discussed frequently, Openshift does not natively support Helm chart based deployment.
 This is because it is difficult to configure the server-side component (Tiller) in a secure manner.
 Helm does have some advantages, such as a robust templating language, versioning, and package dependency management.
-A lot of community software is already packaged as Helm charts, although many of them do not work out of the box due in Openshift to problems with <code>SecurityContextConstraints</code> (discussed earlier).</p>
+A lot of community software is already packaged as Helm charts, although many of them do not work out of the box in Openshift due to the problems with <code>SecurityContextConstraints</code> (discussed earlier).</p>
 </div>
 <div class="paragraph">
 <p>If Helm charts are already used for package distribution in your application, we can continue to package applications using them as part of the deployment artifacts.
