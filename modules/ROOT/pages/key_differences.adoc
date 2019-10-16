@@ -17,12 +17,12 @@ The following is the summary of the key differences:
 | |*ICP* |*OpenShift* |*Migration Effort*
 |*Infrastructure* | | |
 
-|Hardware |x86_64Power (ppc64le)IBM Z |X86_64Power |Z is large migration effort,
+|Hardware |x86_64Power (ppc64le) IBM Z |X86_64Power |Z is large migration effort,
 OpenShift generally runs wherever RHEL runs
 
-|Operating System |Red Hat Enterprise Linux 7.3, 7.4, 7.5Ubuntu 18.04 LTS and
-16.04 LTSSUSE Linux Enterprise (SLES) 12 |RHELRed Hat CoreOS (RHCOS) |Migrating
-from Ubuntu / Suse to OpenShift, customer may require operation procedure change
+|Operating System |Red Hat Enterprise Linux 7.3, 7.4, 7.5; Ubuntu 18.04 LTS and
+16.04 LTS; SUSE Linux Enterprise (SLES) 12 |RHEL Red Hat CoreOS (RHCOS) |Migrating
+from Ubuntu / SUSE to OpenShift, customer may require operation procedure change
 such as OS patching, security certification etc.
 
 |IaaS provider |VMWare/OpenStackMost public cloud IaaS providers
