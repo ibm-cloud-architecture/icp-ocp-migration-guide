@@ -17,16 +17,16 @@ The following is the summary of the key differences:
 | |*ICP* |*OpenShift* |*Migration Effort*
 |*Infrastructure* | | |
 
-|Hardware |x86_64Power (ppc64le)IBM Z |X86_64Power |Z is large migration effort,
+|Hardware |x86_64Power (ppc64le) IBM Z |X86_64Power |Z is large migration effort,
 OpenShift generally runs wherever RHEL runs
 
-|Operating System |Red Hat Enterprise Linux 7.3, 7.4, 7.5Ubuntu 18.04 LTS and
-16.04 LTSSUSE Linux Enterprise (SLES) 12 |RHELRed Hat CoreOS (RHCOS) |Migrating
-from Ubuntu / Suse to OpenShift, customer may require operation procedure change
+|Operating System |Red Hat Enterprise Linux 7.3, 7.4, 7.5; Ubuntu 18.04 LTS and
+16.04 LTS; SUSE Linux Enterprise (SLES) 12 |RHEL Red Hat CoreOS (RHCOS) |Migrating
+from Ubuntu / SUSE to OpenShift, customer may require operation procedure change
 such as OS patching, security certification etc.
 
-|IaaS provider |VMWare/OpenStackMost public cloud IaaS providers
-|VMWare/OpenStackMost of the public cloud IaaS providerIBM Cloud and Azure
+|IaaS provider |VMWare/OpenStack Most public cloud IaaS providers
+|VMWare/OpenStack Most of the public cloud IaaS providerIBM Cloud and Azure
 provide managed OpenShift service |Need to pay attention on the networking and
 storage for the specific IaaS provider, as well as any automation code specific
 to an IaaS provider
@@ -39,8 +39,8 @@ should be part of the OpenShift planning and installation
 RPM or Docker image |Installation procedure particularly any automation script
 requires significant change
 
-|Container Registry |ICP private registryExternal Docker Registry |OpenShift
-Container Registry (OCR)External Docker Registry |Small effort
+|Container Registry |ICP private registry External Docker Registry |OpenShift
+Container Registry (OCR) External Docker Registry |Small effort
 
 |Kubernetes Version | |1.11 |Kubernetes is generally stable after 1.9 but there
 are some features (e.g. storage-related) that are beta in 1.11
@@ -48,50 +48,50 @@ are some features (e.g. storage-related) that are beta in 1.11
 |*Development* | | |
 
 |Local dev environment |Vagrant based local ICP cluster with ICP Community
-edition |MinishiftAll-in-one OKD |Small effort
+edition |Minishift All-in-one OKD |Small effort
 
 |Development Layer | |Projects |Provides higher level Kubernetes construct
 simplifying deployments.
 
-|Development tools |Standard KubernetesMicroprofile |Standard
-KubernetesSource-to-image (S2I)fabric8 |Not too much needs to done for
+|Development tools |Standard Kubernetes Microprofile |Standard
+Kubernetes Source-to-image (S2I) fabric8 |Not too much needs to done for
 developers
 
-|DevOps |Platform neutral DevOps toolchain |Packaged Jenkins for CIImageStream
+|DevOps |Platform neutral DevOps toolchain |Packaged Jenkins for CI ImageStream
 for container images2i |Large effort.
 
-|Application package |Standard Kubernetes yamlHelmOperator |Standard Kubernetes
-yamlOpenShift templateOpenShift ApplicationOperator |Medium to large effort
+|Application package |Standard Kubernetes yaml Helm Operator |Standard Kubernetes
+yaml OpenShift template OpenShift ApplicationOperator |Medium to large effort
 
-|Deployment |Standard Kubernetes deployment and strategy |OpenShift opionated
-DeploymentConfig and ImageStream |Suggest to keep the Kubernetes standard
+|Deployment |Standard Kubernetes deployment and strategy |OpenShift opinionated
+Deployment Config and ImageStream |Suggest to keep the Kubernetes standard
 approach. Small effort
 
 |*Operation* | | |
 
-|Command Line Tool |kubectl |oc (superset of kubetl)kubectl |Small effort when
+|Command Line Tool |kubectl |oc (superset of kubetl) kubectl |Small effort when
 cli is used any operation or devops automation
 
 |User interface |ICP UI |OpenShift UI |Small effort
 
 |Multi-tenancy |Standard Kubernetes namespace and RBAC |OpenShift Project with
-RBACOperator can apply Quotas and limit per project or cluster |Medium effort
+RBAC Operator can apply Quotas and limit per project or cluster |Medium effort
 
 |*Networking* | | |
 
-|SDN (Software Defined Network) |Default on CalicoSupport other Kubernetes
-supported SDN |Default to Red Hat Open vSwitch SDNCan use other Kubernetes
+|SDN (Software Defined Network) |Default on Calico Support other Kubernetes
+supported SDN |Default to Red Hat Open vSwitch SDN Can use other Kubernetes
 supported SDN as well |Small effort. Most of these are internal to ICP and
 OpenShift
 
 |Cluster DNS |CoreDNS |SkyDNS (3.x)CoreDNS (4.x) |
 
-|External Access for Services |Ingress ControllerLoad Balancer |Router
-(HAProxy)Load Balancer |Medium effort to update the service exposure
+|External Access for Services |Ingress Controller Load Balancer |Router
+(HAProxy) Load Balancer |Medium effort to update the service exposure
 
 |*Storage* | | |
 
-|File Storage |GlusterFSNFS |GlusterFSNFSCeph |
+|File Storage |GlusterFS NFS |GlusterFS NFS Ceph |
 
 |*Security* | | |
 
@@ -100,14 +100,14 @@ container as root by default (best practice) |Small effort to rebuild the
 application container
 
 |Authentication |OpenID with primarily LDAP identify provider |OAuth with
-identity providerOpenShift supports different kinds of IAM |Small effort
+identity provider OpenShift supports different kinds of IAM |Small effort
 
-|Authorization |RBAC as aboveKubernetes called Pod Security Policies (PSP) beta
-|RBAC as aboveOpenShift Security Context Constraint (SCC) |Small effort, some
+|Authorization |RBAC as above Kubernetes called Pod Security Policies (PSP) beta
+|RBAC as above OpenShift Security Context Constraint (SCC) |Small effort, some
 changes needed in particular to address the SCC
 
-|Securing the master |TLS to masterX.509 certifate or token to access API server
-|TLSX.509 certifate or token to access API serverProject quota to limit the
+|Securing the master |TLS to master X.509 certifate or token to access API server
+|TLSX.509 certifate or token to access API server Project quota to limit the
 token rate |Small effort
 |===
 
