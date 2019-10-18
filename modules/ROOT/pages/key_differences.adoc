@@ -31,7 +31,7 @@ provide managed OpenShift service |Need to pay attention on the networking and
 storage for the specific IaaS provider, as well as any automation code specific
 to an IaaS provider
 
-|HA Cluster Topology |MasterProxyManagementVA |MasterWorker |Migration effort
+|HA Cluster Topology |Master Proxy Management VA |Master Worker |Migration effort
 should be part of the OpenShift planning and installation
 
 |Installation |Ansible installer Delivered as Docker image |Ansible installer
@@ -84,7 +84,7 @@ supported SDN |Default to Red Hat Open vSwitch SDN Can use other Kubernetes
 supported SDN as well |Small effort. Most of these are internal to ICP and
 OpenShift
 
-|Cluster DNS |CoreDNS |SkyDNS (3.x)CoreDNS (4.x) |
+|Cluster DNS |CoreDNS |SkyDNS (3.x) CoreDNS (4.x) |
 
 |External Access for Services |Ingress Controller Load Balancer |Router
 (HAProxy) Load Balancer |Medium effort to update the service exposure
