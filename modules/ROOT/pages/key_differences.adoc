@@ -57,7 +57,7 @@ simplifying deployments.
 Kubernetes Source-to-image (S2I) fabric8 |Not too much needs to done for
 developers
 
-|DevOps |Platform neutral DevOps toolchain |Packaged Jenkins for CI ImageStream
+|DevOps |Platform neutral DevOps toolchain |Packaged Jenkins for CI Image Stream
 for container images2i |Large effort.
 
 |Application package |Standard Kubernetes yaml Helm Operator |Standard Kubernetes
