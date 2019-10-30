@@ -220,7 +220,7 @@ OpenShift developers can use several approaches to local development.
 
 * Develop code and Docker images locally and deploy to a remote cluster. There
 are several ``managed OpenShift Options'' on various public clouds.
-* If you need to run a local kubrnetes distribution you can use.
+* If you need to run a local kubernetes distribution you can use.
 ** *Minikube:* This is the standard community Kubernetes. However, this will
 require you maintain duplicate YAML artifacts. This approach is not recommended.
 ** *OKD:* This is the Origin Community Distribution that powers OpenShift. You
@@ -231,6 +231,7 @@ single-node OKD cluster inside a virtual machine. With Minishift you can try out
 OKD or develop with it, day-to-day, on your local machine. You can run Minishift
 on the Windows, macOS, and GNU/Linux operating systems. More information can be
 found here: https://www.okd.io/minishift/
+** CodeReady Containers:  Starting with OpenShift 4, CodeReady Containers is the standard way to run a local OpenShift environment.  Red Hat CodeReady Containers brings a minimal OpenShift 4.0 or newer cluster to your local computer. This cluster provides a minimal environment for development and testing purposes. It’s mainly targeted at running on developers' desktops.
 
 OpenShift is not opinionated on the application stack and provides templates for
 various popular OpenSource frameworks such as Spring, Java EE, JBoss, Quarkus,
