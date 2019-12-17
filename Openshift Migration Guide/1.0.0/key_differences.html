@@ -130,10 +130,9 @@ the key differences between the two platforms.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Hardware</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x86_64Power (ppc64le) IBM Z</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">X86_64Power</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Z is large migration effort,
-OpenShift generally runs wherever RHEL runs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x86_64, Power(ppc64le), IBM Z</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X86_64, Power, IBM Z</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Installation on Bare-metal (including IBM Z) requires medium effort</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Operating System</p></td>
@@ -147,7 +146,7 @@ such as OS patching, security certification etc.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">IaaS provider</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">VMWare/OpenStack Most public cloud IaaS providers</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VMWare/OpenStack Most of the public cloud IaaS providerIBM Cloud and Azure
+<td class="tableblock halign-left valign-top"><p class="tableblock">VMWare/OpenStack/zVM, Most of the public cloud IaaS providerIBM Cloud and Azure
 provide managed OpenShift service</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Need to pay attention on the networking and
 storage for the specific IaaS provider, as well as any automation code specific
@@ -179,7 +178,7 @@ Container Registry (OCR) External Docker Registry</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes Version</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.11+</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes is generally stable after 1.9 but there
 are some features (e.g. storage-related) that are beta in 1.11</p></td>
 </tr>
