@@ -3,13 +3,8 @@
 
 Note that the guide is still being developed and updates are still ongoing.
 
-ifndef::env-github[]
-include::./key_differences.adoc[Key differences between Openshift and ICP]
-include::./migration_strategy.adoc[migration strategy]
-endif::[]
+You can access the migration guide at:
 
-ifdef::env-github[]
-* link:./key_differences.adoc[Key differences between Openshift and ICP]
-* link:./migration_strategy.adoc[Migration strategy]
-endif::[]
+https://pages.github.ibm.com/CASE/openshift-migration-guide/
+
 
