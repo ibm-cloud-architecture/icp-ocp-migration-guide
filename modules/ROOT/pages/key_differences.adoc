@@ -25,7 +25,7 @@ from Ubuntu / SUSE to OpenShift, customer may require operation procedure change
 such as OS patching, security certification etc.
 
 |IaaS provider |VMWare/OpenStack Most public cloud IaaS providers
-|VMWare/OpenStack/zVM Most of the public cloud IaaS providerIBM Cloud and Azure
+|VMWare/OpenStack/zVM, Most of the public cloud IaaS providerIBM Cloud and Azure
 provide managed OpenShift service |Need to pay attention on the networking and
 storage for the specific IaaS provider, as well as any automation code specific
 to an IaaS provider
