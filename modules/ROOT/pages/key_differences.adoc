@@ -17,8 +17,7 @@ The following is the summary of the key differences:
 | |*ICP* |*OpenShift* |*Migration Effort*
 |*Infrastructure* | | |
 
-|Hardware |x86_64Power (ppc64le) IBM Z |X86_64Power |Z is large migration effort,
-OpenShift generally runs wherever RHEL runs
+|Hardware |x86_64, Power(ppc64le), IBM Z |X86_64, Power, IBM Z | Installation on Bare-metal (including IBM Z) requires medium effort
 
 |Operating System |Red Hat Enterprise Linux 7.3, 7.4, 7.5; Ubuntu 18.04 LTS and
 16.04 LTS; SUSE Linux Enterprise (SLES) 12 |RHEL Red Hat CoreOS (RHCOS) |Migrating
@@ -26,7 +25,7 @@ from Ubuntu / SUSE to OpenShift, customer may require operation procedure change
 such as OS patching, security certification etc.
 
 |IaaS provider |VMWare/OpenStack Most public cloud IaaS providers
-|VMWare/OpenStack Most of the public cloud IaaS providerIBM Cloud and Azure
+|VMWare/OpenStack/zVM Most of the public cloud IaaS providerIBM Cloud and Azure
 provide managed OpenShift service |Need to pay attention on the networking and
 storage for the specific IaaS provider, as well as any automation code specific
 to an IaaS provider
@@ -42,7 +41,7 @@ requires significant change
 |Container Registry |ICP private registry External Docker Registry |OpenShift
 Container Registry (OCR) External Docker Registry |Small effort
 
-|Kubernetes Version | |1.11 |Kubernetes is generally stable after 1.9 but there
+|Kubernetes Version | |1.11+ |Kubernetes is generally stable after 1.9 but there
 are some features (e.g. storage-related) that are beta in 1.11
 
 |*Development* | | |
