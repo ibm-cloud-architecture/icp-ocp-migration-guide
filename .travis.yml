@@ -46,7 +46,9 @@ jobs:
         git fetch;
       fi'
     deploy:
-      provider: script
-      script: bash deploy.sh
+      provider: pages
+      skip_cleanup: true
+      github_token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
+      keep_history: true
       on:
-        branch: antora
+        branch: travis_fix
