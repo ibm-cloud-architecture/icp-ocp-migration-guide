@@ -44,5 +44,9 @@ jobs:
         git add .;
         git commit -m "Travis build: $TRAVIS_BUILD_NUMBER Documentation Updated";
         git fetch;
-        git push --quiet --set-upstream origin-pages gh-pages;
       fi'
+    deploy:
+      provider: script
+      script: bash deploy.sh
+      on:
+        branch: antora
