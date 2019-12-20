@@ -165,8 +165,8 @@ endif::[]
 
 ==== Monitoring Data
 
-* ( TBD - )
+* tbd
 
 ==== Historical Log Data
 
-* ( TBD - )
+* tbd
