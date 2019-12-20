@@ -50,4 +50,4 @@ jobs:
       script:
       - git push --quiet --set-upstream origin-pages gh-pages;
       on:
-        branch: travis_fix
+        branch: master
