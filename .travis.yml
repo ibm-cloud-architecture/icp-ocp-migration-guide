@@ -47,6 +47,9 @@ jobs:
       fi'
     deploy:
       provider: script
-      script: bash deploy.sh
+      script:
+      - 'if [ $FORCE_DOC_GEN == 0 ] || [ $GENERATE_DOC == 0 ]; then
+        git push --quiet --set-upstream origin-pages gh-pages;
+        fi'
       on:
         branch: travis_fix
