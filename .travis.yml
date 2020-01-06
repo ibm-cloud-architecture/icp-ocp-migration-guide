@@ -19,7 +19,7 @@ jobs:
     - docker
     install:
     - true
-    script:
+    before_install:
     - BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
     - '[ $(git log --format=%B  $TRAVIS_COMMIT_RANGE | grep -i "#doc" | wc -l) -gt 0 ] && FORCE_DOC_GEN=0 || FORCE_DOC_GEN=1'
     - MODIFIED_DOCS=$(git diff --name-only $TRAVIS_COMMIT_RANGE | grep -E '.*.adoc$' | wc -l)
@@ -32,11 +32,22 @@ jobs:
         git worktree add -b gh-pages gh-pages origin/gh-pages;
         git remote add origin-pages https://${GH_USER}:${GH_TOKEN}@${GH_URL}/${GH_ORG}/${GH_REPO}.git > /dev/null 2>&1;
         docker pull antora/antora:1.1.1;
+      fi'
+    script:
+    - 'if [ $FORCE_DOC_GEN == 0 ] || [ $GENERATE_DOC == 0 ]; then
         docker run -v $TRAVIS_BUILD_DIR:/antora --rm -t antora/antora:1.1.1 --pull --stacktrace site.yml;
+      fi'
+    after_success:
+    - 'if [ $FORCE_DOC_GEN == 0 ] || [ $GENERATE_DOC == 0 ]; then
         cd gh-pages;
         sudo touch .nojekyll;
         git add .;
         git commit -m "Travis build: $TRAVIS_BUILD_NUMBER Documentation Updated";
         git fetch;
-        git push --quiet --set-upstream origin-pages gh-pages;
       fi'
+    deploy:
+      provider: script
+      script:
+      - git push --quiet --set-upstream origin-pages gh-pages;
+      on:
+        branch: master
