@@ -12,7 +12,7 @@ https://pages.github.ibm.com/CASE/openshift-migration-guide/Openshift%20Migratio
 
 == How to Contribute
 
-We welcome contributions from the community by opening an issue or submit a pull request. Please reference the [Contribution guide] for detail.
+We welcome contributions from the community by opening an issue or submit a pull request. Please reference the link:contribution.adoc[Contribution guide] for detail.
 
 
 
