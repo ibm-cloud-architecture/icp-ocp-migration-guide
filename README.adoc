@@ -1,15 +1,20 @@
 = ICP to OpenShift migration guide
 :toc:
 
-Note that the guide is still being developed and updates are still ongoing.
+This document is developed by IBM garage consultants to provide reference guide when migrating IBM Cloud Private (ICP) to Red Hat OpenShift. 
+It is maintained primarily by IBM Garage Solutoin Engineering team to assit in service delivery, but the guide is open to wider community in the spirit of sharing.
+
+IMPORTANT: The guide is **NOT** officail product documentation. It is still being developed and updates are ongoing.
 
 ifndef::env-github[]
-include::./key_differences.adoc[Key differences between Openshift and ICP]
-include::./migration_strategy.adoc[migration strategy]
+https://pages.github.ibm.com/CASE/openshift-migration-guide/Openshift%20Migration%20Guide/1.0.0/index.html[ICP to OpenShift Migration Guide]
 endif::[]
 
-ifdef::env-github[]
-* link:./key_differences.adoc[Key differences between Openshift and ICP]
-* link:./migration_strategy.adoc[Migration strategy]
-endif::[]
+== How to contribute
+
+We welcome contributions from the community by opening an issue or submit a pull request. Please reference the [Contribution guide] for detail.
+
+
+
+
 

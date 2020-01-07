@@ -1,4 +1,4 @@
-# Contributing to Openshift guide
+# Contributing to ICP to Openshift Migration Guide
 
 To contribute to Openshift guide, there are multiple ways: report bugs and improvement suggestions, improve documentation, and contribute to it.
 
