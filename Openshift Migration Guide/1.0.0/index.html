@@ -245,23 +245,22 @@ should be part of the OpenShift planning and installation</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Installation</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Ansible installer Delivered as Docker image</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Ansible installer
-(v4.x completely changed the installation procedure with Operator) Delivered as
-RPM or Docker image</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ansible installer for OCP 3.x,
+v4.x completely changed the installation procedure with Operator and CoreOS.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Installation procedure particularly any automation script
-requires significant change</p></td>
+requires change</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Container Registry</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ICP private registry External Docker Registry</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ICP private registry, External Container Registry</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift
-Container Registry (OCR) External Docker Registry</p></td>
+Container Registry (OCR), Quay, External Container Registry</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Small effort</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes Version</p></td>
 <td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.11+</p></td>
+<td class="tableblock halign-left valign-top"></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Kubernetes is generally stable after 1.9 but there
 are some features (e.g. storage-related) that are beta in 1.11</p></td>
 </tr>
@@ -275,7 +274,7 @@ are some features (e.g. storage-related) that are beta in 1.11</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Local dev environment</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Vagrant based local ICP cluster with ICP Community
 edition</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Minishift All-in-one OKD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minishift All-in-one, OKD</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Small effort</p></td>
 </tr>
 <tr>
@@ -290,7 +289,7 @@ simplifying deployments.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Standard Kubernetes Microprofile</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Standard
 Kubernetes Source-to-image (S2I) fabric8</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Not too much needs to done for
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not much needs to be done for
 developers</p></td>
 </tr>
 <tr>
@@ -304,7 +303,7 @@ for container images2i</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Application package</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Standard Kubernetes yaml Helm Operator</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Standard Kubernetes
-yaml OpenShift template OpenShift ApplicationOperator</p></td>
+yaml, OpenShift template OpenShift Application, Operator, Helm Operator</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Medium to large effort</p></td>
 </tr>
 <tr>
@@ -351,7 +350,7 @@ RBAC Operator can apply Quotas and limit per project or cluster</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">SDN (Software Defined Network)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default on Calico Support other Kubernetes
 supported SDN</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default to Red Hat Open vSwitch SDN Can use other Kubernetes
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default to Red Hat Open vSwitch SDN,  Can use other Kubernetes
 supported SDN as well</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Small effort. Most of these are internal to ICP and
 OpenShift</p></td>
@@ -964,7 +963,7 @@ system and platform automation.</p>
 <h3 id="_hardware_and_hypervisor"><a class="anchor" href="#_hardware_and_hypervisor"></a>Hardware and hypervisor</h3>
 <div class="paragraph">
 <p>ICP can be deployed on (Linux) x86_64, Power (ppc64le) and IBM Z and LinuxOne.
-OpenShift now can run x86_64 and Power hardware. Each has its own sizing
+OpenShift now can run x86_64, Power and IBM Z hardware. Each has its own sizing
 recommendation in terms of CPU, memory and disk space. You can reference the
 system requirement for both below:</p>
 </div>
@@ -975,6 +974,10 @@ system requirement for both below:</p>
 <div class="paragraph">
 <p>OpenShift (3.11) hardware requirement -
 <a href="https://docs.openshift.com/container-platform/3.11/install/prerequisites.html#hardware">https://docs.OpenShift.com/container-platform/3.11/install/prerequisites.html#hardware</a></p>
+</div>
+<div class="paragraph">
+<p>OpenShift 4.2 system requirement -
+<a href="https://docs.openshift.com/container-platform/4.2/welcome/oce_about.html" class="bare">https://docs.openshift.com/container-platform/4.2/welcome/oce_about.html</a></p>
 </div>
 <div class="paragraph">
 <p>Both ICP and OpenShift can run on Hypervisors like VMware, OpenStack and Hyper-V
@@ -1038,7 +1041,18 @@ activity.</p>
 <div class="sect1">
 <h2 id="_storage"><a class="anchor" href="#_storage"></a>Storage</h2>
 <div class="sectionbody">
-
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Work in progress.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
