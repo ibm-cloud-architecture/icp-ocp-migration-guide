@@ -33,34 +33,33 @@ to an IaaS provider
 |HA Cluster Topology |Master Proxy Management VA |Master Worker |Migration effort
 should be part of the OpenShift planning and installation
 
-|Installation |Ansible installer Delivered as Docker image |Ansible installer
-(v4.x completely changed the installation procedure with Operator) Delivered as
-RPM or Docker image |Installation procedure particularly any automation script
-requires significant change
+|Installation |Ansible installer Delivered as Docker image |Ansible installer for OCP 3.x, 
+v4.x completely changed the installation procedure with Operator and CoreOS. |Installation procedure particularly any automation script
+requires change
 
-|Container Registry |ICP private registry External Docker Registry |OpenShift
-Container Registry (OCR) External Docker Registry |Small effort
+|Container Registry |ICP private registry, External Container Registry |OpenShift
+Container Registry (OCR), Quay, External Container Registry |Small effort
 
-|Kubernetes Version | |1.11+ |Kubernetes is generally stable after 1.9 but there
+|Kubernetes Version | | |Kubernetes is generally stable after 1.9 but there
 are some features (e.g. storage-related) that are beta in 1.11
 
 |*Development* | | |
 
 |Local dev environment |Vagrant based local ICP cluster with ICP Community
-edition |Minishift All-in-one OKD |Small effort
+edition |Minishift All-in-one, OKD |Small effort
 
 |Development Layer | |Projects |Provides higher level Kubernetes construct
 simplifying deployments.
 
 |Development tools |Standard Kubernetes Microprofile |Standard
-Kubernetes Source-to-image (S2I) fabric8 |Not too much needs to done for
+Kubernetes Source-to-image (S2I) fabric8 |Not much needs to be done for
 developers
 
 |DevOps |Platform neutral DevOps toolchain |Packaged Jenkins for CI Image Stream
 for container images2i |Large effort.
 
 |Application package |Standard Kubernetes yaml Helm Operator |Standard Kubernetes
-yaml OpenShift template OpenShift ApplicationOperator |Medium to large effort
+yaml, OpenShift template OpenShift Application, Operator, Helm Operator |Medium to large effort
 
 |Deployment |Standard Kubernetes deployment and strategy |OpenShift opinionated
 Deployment Config and ImageStream |Suggest to keep the Kubernetes standard
@@ -79,7 +78,7 @@ RBAC Operator can apply Quotas and limit per project or cluster |Medium effort
 |*Networking* | | |
 
 |SDN (Software Defined Network) |Default on Calico Support other Kubernetes
-supported SDN |Default to Red Hat Open vSwitch SDN Can use other Kubernetes
+supported SDN |Default to Red Hat Open vSwitch SDN,  Can use other Kubernetes
 supported SDN as well |Small effort. Most of these are internal to ICP and
 OpenShift
 
@@ -477,7 +476,7 @@ system and platform automation.
 === Hardware and hypervisor
 
 ICP can be deployed on (Linux) x86_64, Power (ppc64le) and IBM Z and LinuxOne.
-OpenShift now can run x86_64 and Power hardware. Each has its own sizing
+OpenShift now can run x86_64, Power and IBM Z hardware. Each has its own sizing
 recommendation in terms of CPU, memory and disk space. You can reference the
 system requirement for both below:
 
@@ -486,6 +485,10 @@ https://www.ibm.com/support/knowledgecenter/SSBS6K_3.2.0/supported_system_config
 
 OpenShift (3.11) hardware requirement -
 https://docs.openshift.com/container-platform/3.11/install/prerequisites.html#hardware[https://docs.OpenShift.com/container-platform/3.11/install/prerequisites.html#hardware]
+
+OpenShift 4.2 system requirement -
+https://docs.openshift.com/container-platform/4.2/welcome/oce_about.html
+
 
 Both ICP and OpenShift can run on Hypervisors like VMware, OpenStack and Hyper-V
 in a private cloud environment. ICP is also supported on IBM PowerVC.
@@ -526,6 +529,8 @@ running on Ubuntu or Suse Linux. Most of this is infrastructure related Ops
 activity.
 
 == Storage
+
+IMPORTANT: Work in progress.
 
 == Security
 
