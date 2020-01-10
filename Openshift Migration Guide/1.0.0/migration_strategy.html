@@ -116,7 +116,10 @@ platforms, for example:</p>
 <p><a href="https://github.com/ibm-cloud-architecture/terraform-icp-vmware" class="bare">https://github.com/ibm-cloud-architecture/terraform-icp-vmware</a></p>
 </div>
 <div class="paragraph">
-<p>Terraform Examples for OpenShift will be published soon.</p>
+<p>Terraform Examples for OpenShift 4.x:
+<a href="https://github.com/ibm-cloud-architecture/terraform-openshift4-aws" class="bare">https://github.com/ibm-cloud-architecture/terraform-openshift4-aws</a>
+<a href="https://github.com/ibm-cloud-architecture/terraform-openshift4-azure" class="bare">https://github.com/ibm-cloud-architecture/terraform-openshift4-azure</a>
+<a href="https://github.com/ibm-cloud-architecture/terraform-openshift4-gcp" class="bare">https://github.com/ibm-cloud-architecture/terraform-openshift4-gcp</a></p>
 </div>
 <div class="paragraph">
 <p>In scenarios where resources are limited, the approach involves draining and
@@ -300,7 +303,7 @@ The configuration is as follows:</p>
         preferredUsername:
         - uid
       bindDN: "cn=binduser,dc=internal-network,dc=local"
-      bindPassword: "Letmein"
+      bindPassword: "xxx"
       insecure: true
       url: "ldap://192.168.100.4:389/dc=internal-network,dc=local?uid?sub?(objectclass=person)"</pre>
 </div>
@@ -404,7 +407,7 @@ following rfc2307 LDAP sync config:</p>
 apiVersion: v1
 url: ldap://192.168.100.4:389/dc=internal-network,dc=local
 bindDN: "cn=binduser,dc=internal-network,dc=local"
-bindPassword: "Letmein"
+bindPassword: "xxxx"
 insecure: true
 rfc2307:
     groupsQuery:
@@ -1321,6 +1324,18 @@ storage.</p>
 </div>
 <div class="sect2">
 <h3 id="_platform_data_migration"><a class="anchor" href="#_platform_data_migration"></a>Platform Data Migration</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Working in progress
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
 <h4 id="_monitoring_data"><a class="anchor" href="#_monitoring_data"></a>Monitoring Data</h4>
 
