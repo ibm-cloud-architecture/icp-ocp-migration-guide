@@ -160,7 +160,7 @@ identityProviders:
         preferredUsername:
         - uid
       bindDN: "cn=binduser,dc=internal-network,dc=local"
-      bindPassword: "Letmein"
+      bindPassword: "xxx"
       insecure: true
       url: "ldap://192.168.100.4:389/dc=internal-network,dc=local?uid?sub?(objectclass=person)"
 ....
@@ -241,7 +241,7 @@ kind: LDAPSyncConfig
 apiVersion: v1
 url: ldap://192.168.100.4:389/dc=internal-network,dc=local
 bindDN: "cn=binduser,dc=internal-network,dc=local"
-bindPassword: "Letmein"
+bindPassword: "xxxx"
 insecure: true
 rfc2307:
     groupsQuery:

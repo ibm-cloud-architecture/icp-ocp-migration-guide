@@ -20,7 +20,11 @@ platforms, for example:
 
 https://github.com/ibm-cloud-architecture/terraform-icp-vmware
 
-Terraform Examples for OpenShift will be published soon.
+Terraform Examples for OpenShift 4.x:
+https://github.com/ibm-cloud-architecture/terraform-openshift4-aws
+https://github.com/ibm-cloud-architecture/terraform-openshift4-azure
+https://github.com/ibm-cloud-architecture/terraform-openshift4-gcp
+
 
 In scenarios where resources are limited, the approach involves draining and
 removing under-utilized ICP worker nodes and using the capacity to build a small
@@ -162,6 +166,8 @@ endif::[]
 
 
 === Platform Data Migration
+
+NOTE: Working in progress
 
 ==== Monitoring Data
 
