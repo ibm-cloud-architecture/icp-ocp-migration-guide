@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: Openshift Migration Guide</title>
+    <link rel="canonical" href="https://github.com/ibm-cloud-architecture/icp-ocp-migration-guide/Openshift Migration Guide/1.0.0/migration/storage.html">
+    <meta name="generator" content="Antora 2.0.0">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header" role="banner">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <p>Openshift Migration Guide</p>
+      </div>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="Openshift Migration Guide" data-version="1.0.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Openshift Migration Guide</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Migration</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_mod.html">Container Modification</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="container_scc.html">Security Context Constraints</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="ldap_migration.html">User Authentication Migration (LDAP)</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="rbac_migration.html">User Authorization Migration (RBAC)</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="storage.html">Storage Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="app_resource_migration.html">App resource Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="cd_migration.html">GitOps Migration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jenkins_migration.html">Jenkins server Migration</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Openshift Migration Guide</span>
+    <span class="version">1.0.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">Openshift Migration Guide</span>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1.0.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main>
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Openshift Migration Guide</a></li>
+    <li>Migration</li>
+    <li><a href="storage.html">Storage Migration</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="file:///Users/Hemankita.Perabathini@ibm.com/icp-ocp-mig-guide/icp-ocp-migration-guide/modules/ROOT/pages/migration/storage.adoc">Edit this Page</a></div>
+  </div>
+<article class="doc">
+<div class="sect2">
+<h3 id="_storage_migration"><a class="anchor" href="#_storage_migration"></a>Storage Migration</h3>
+<div class="paragraph">
+<p>We will focus on Kubernetes Storage under the context of ICP to OCP migration.
+For detail storage and Kubernetes usage, please reference the
+<a href="https://ibm-cloud-architecture.github.io/kubernetes-storage-cookbook/">Kubernetes
+Storage Cookbook</a>.</p>
+</div>
+<div class="paragraph">
+<p>The migration has to take into consideration of both the Kubernetes Storage
+Provider and Storage consumer (database or application).</p>
+</div>
+<div class="sect3">
+<h4 id="_storage_provider"><a class="anchor" href="#_storage_provider"></a>Storage Provider</h4>
+<div class="paragraph">
+<p>In general, Kubernetes supports quite a few storage providers including
+hostPath, NFS, Ceph, Gluster, vSphere, minio, Cloud-based storage (S3 etc.). And
+these providers can be deployed either as a part of a Kubernetes cluster
+(internal storage) or storage provided by an external service (external
+storage). For the migration, we’ll focus on the internal storage or in-cluster
+storage provider.</p>
+</div>
+<div class="paragraph">
+<p>Following storage can be hosted on ICP cluster nodes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>GlusterFS</p>
+</li>
+<li>
+<p>Ceph block storage by using Rook</p>
+</li>
+<li>
+<p>Minio</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Red Hat Openshift support both GluserFS and Ceph as in-cluster storage
+providers. Haven’t heard the official support for Minio.</p>
+</div>
+<div class="paragraph">
+<p>There is no migration path or tools available to migrate ICP storage nodes to
+Openshift. So, it boils down to handle the migration from the storage consumer’s
+aspect.</p>
+</div>
+<div class="paragraph">
+<p>If you are using external storage provider, as far as it is supported by
+Openshift (all do except Minio), you just need to migrate the storage consumer
+and leave the external storage provider as-is.</p>
+</div>
+<div class="paragraph">
+<p>If you are using internal storage provider, you need to setup the Openshift
+Storage nodes, either GlusterFS or Ceph, using the same/similar spec as in ICP
+in terms of disk size, storage type, number of nodes. Then, proceed to storage
+consumer migration.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_storage_consumer"><a class="anchor" href="#_storage_consumer"></a>Storage Consumer</h4>
+<div class="paragraph">
+<p>Each client might have different storage consumption pattern, we’ll try to
+categorize them into the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Container applications requires persistent Storage</p>
+</li>
+<li>
+<p>Kubernetes Statefulset application</p>
+</li>
+<li>
+<p>Databases running on Kubernetes such as MongoDB, MySQL, Cloudant etc.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We’ll assume that all these storage needs are implemented as Kubernetes
+recommended Persistent Volume (PV) and Persistent Volume Claims (PVC).</p>
+</div>
+<div class="paragraph">
+<p>When it comes to migration to OCP, it really becomes a storage backup and
+restore discussion. Depends on the storage consumer type (database vs. custom
+application), it can be done with:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Kubernetes PV backup and restore</p>
+</li>
+<li>
+<p>Using Application/Database native backup-restore tools</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This guide will be focus on the first approach where you migrate kubernetes PV.</p>
+</div>
+<div class="paragraph">
+<p>One common approach of backing up Kubernetes PV is the
+<a href="https://github.com/heptio/velero">Velero project</a> from Heptio. The concept is
+Velero will take your PV snapshots, stores it on object storage (like S3 or
+Minio). Then, you can restore it to another Kubernetes cluster.</p>
+</div>
+<div class="paragraph">
+<p>For detail on how the tool works in generic Kubernetes, please reference
+<a href="https://blog.kubernauts.io/backup-and-restore-of-kubernetes-applications-using-heptios-velero-with-restic-and-rook-ceph-as-2e8df15b1487">this
+blog post</a></p>
+</div>
+<div class="paragraph">
+<p>Still, there are some limitations with Velero approach. For example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It does not support the migration of persistent volumes across cloud
+providers.</p>
+</li>
+<li>
+<p>Velero + Restic currently supports backing up to only S3 compatible object
+storage.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../../_/js/site.js"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
