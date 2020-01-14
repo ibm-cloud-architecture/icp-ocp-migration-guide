@@ -58,7 +58,7 @@ application BlueCompute that was running on ICP to Openshift.
 
 https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes
 
-For detailed steps on how to migrate Bluecompute from ICP to Openshift, refer this doc - https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/spring/docs/openshift/README.md[BlueCompute on OpenShift].
+For detailed steps on how to migrate BlueCompute from ICP to Openshift, refer this doc - https://github.com/ibm-cloud-architecture/refarch-cloudnative-kubernetes/blob/spring/docs/openshift/README.md[BlueCompute on OpenShift].
 
 ifndef::env-github[]
 
