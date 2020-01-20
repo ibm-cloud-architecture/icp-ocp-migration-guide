@@ -48,11 +48,11 @@ jobs:
           name: Install and configure dependencies
           command: |
             yarn  global add gh-pages@2.0.1
-            git config user.email "hemankita.perabathini@ibm.com"
-            git config user.name "hemankita"
+            git config user.email "gangchen.dev@gmail.com"
+            git config user.name "gangchen03"
       - add_ssh_keys:
           fingerprints:
-            - "7b:42:ef:ad:69:74:d8:ba:e2:e0:b3:db:11:fa:9a:cb"
+            - "4e:9a:6f:19:9b:18:4b:f0:25:41:75:1e:c8:9c:cb:9a"
       - run:
           name: Deploy docs to gh-pages branch
           command: gh-pages --dotfiles --message "[skip ci] Publishing new documentation" --dist gh-pages
