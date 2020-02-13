@@ -8,7 +8,7 @@ IMPORTANT: The guide is **NOT** official product documentation. It is still bein
 
 == Access the Migration Guide
 
-https://pages.github.ibm.com/CASE/openshift-migration-guide/Openshift%20Migration%20Guide/1.0.0/index.html[ICP to OpenShift Migration Guide]
+https://ibm-cloud-architecture.github.io/icp-ocp-migration-guide/Openshift%20Migration%20Guide/1.0.0/index.html[ICP to OpenShift Migration Guide]
 
 == How to Contribute
 
